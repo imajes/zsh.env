@@ -12,6 +12,9 @@ fi
 # Zsh configuration
 # -----------------
 
+# set editor to be nvim
+export EDITOR=nvim
+
 #
 # History
 #
