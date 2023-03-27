@@ -1,0 +1,92 @@
+#
+# This is not sourced during shell startup, and it's only used to configure the
+# zimfw plugin manager. - use `zimfw install` to deploy
+#
+
+#
+# Modules
+#
+
+# Sets sane Zsh built-in environment options.
+zmodule environment
+# Provides handy git aliases and functions.
+zmodule git
+# Applies correct bindkeys for input events.
+zmodule input
+# Sets a custom terminal title.
+zmodule termtitle
+# Utility aliases and functions. Adds colour to ls, grep and less.
+zmodule utility
+# Helpers for ruby
+zmodule ruby
+# Helpers for exa etc
+zmodule exa
+# lets use fzf to help with fuzzyfind
+zmodule fzf
+
+#
+# Modules from elsewhere
+#
+
+zmodule sorin-ionescu/prezto --root modules/command-not-found
+zmodule sorin-ionescu/prezto --root modules/spectrum
+
+# zmodule ohmyzsh/ohmyzsh --root plugins/1password
+zmodule ohmyzsh/ohmyzsh --root plugins/ansible
+zmodule ohmyzsh/ohmyzsh --root plugins/aws
+zmodule ohmyzsh/ohmyzsh --root plugins/battery
+zmodule ohmyzsh/ohmyzsh --root plugins/brew
+zmodule ohmyzsh/ohmyzsh --root plugins/codeclimate
+zmodule ohmyzsh/ohmyzsh --root plugins/direnv
+zmodule ohmyzsh/ohmyzsh --root plugins/git-extras
+# zmodule ohmyzsh/ohmyzsh --root plugins/url-quote-magic
+# zmodule ohmyzsh/ohmyzsh --root plugins/git-escape-magic
+zmodule ohmyzsh/ohmyzsh --root plugins/github
+zmodule ohmyzsh/ohmyzsh --root plugins/heroku
+zmodule ohmyzsh/ohmyzsh --root plugins/keychain
+
+
+zmodule eventi/noreallyjustfuckingstopalready # macos dns. https://github.com/eventi/noreallyjustfuckingstopalready
+zmodule peterhurford/git-it-on.zsh # open repo in the websites
+zmodule djui/alias-tips # you got an alias for that bruh
+zmodule skx/sysadmin-util # yeah, why not https://github.com/skx/sysadmin-util
+zmodule unixorn/1password-op.plugin.zsh #  1password
+zmodule unixorn/git-extra-commands # moar gits moar https://github.com/unixorn/git-extra-commands also, tj/git-extras?
+zmodule unixorn/rake-completion.zshplugin # make the rake the zake
+zmodule agkozak/zsh-z # recent directories - https://github.com/agkozak/zsh-z
+zmodule joke/zim-rtx # integrate rtx
+
+#
+# Prompt
+#
+
+# Exposes to prompts how long the last command took to execute, used by asciiship.
+zmodule duration-info
+# Exposes git repository status information to prompts, used by asciiship.
+zmodule git-info
+# use powerlevel10k https://github.com/romkatv/powerlevel10k
+zmodule romkatv/powerlevel10k --use degit
+
+#
+# Completion
+#
+
+# Additional completion definitions for Zsh.
+zmodule zsh-users/zsh-completions --fpath src
+# Enables and configures smart and extensive tab completion.
+# completion must be sourced after all modules that add completion definitions.
+zmodule completion
+
+#
+# Modules that must be initialized last
+#
+
+# Fish-like syntax highlighting for Zsh.
+# zsh-users/zsh-syntax-highlighting must be sourced after completion
+zmodule zsh-users/zsh-syntax-highlighting
+# Fish-like history search (up arrow) for Zsh.
+# zsh-users/zsh-history-substring-search must be sourced after zsh-users/zsh-syntax-highlighting
+zmodule zsh-users/zsh-history-substring-search
+# Fish-like autosuggestions for Zsh.
+zmodule zsh-users/zsh-autosuggestions
+
