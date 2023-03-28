@@ -1,5 +1,6 @@
 .zim
 .zcompdump*
 .zsh_history
+.zhistory
 .zsh_sessions/*
 .zshz-data
