@@ -151,3 +151,6 @@ unset key
 export GREP_COLORS='sl=48;5;236;97:cx=40;37;2:mt=48;5;186;30:fn=49;38;5;197;2:ln=49;38;5;154;1:bn=49;38;5;141:se=49;38;5;81'
 unset GREP_COLOR
 alias grep='ggrep --color=always'
+
+alias ks="kitty +kitten ssh"
+alias kd="kitty +kitten diff"
