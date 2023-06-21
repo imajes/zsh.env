@@ -154,3 +154,5 @@ unset GREP_COLOR
 if [ -f /opt/homebrew/bin/ggrep ]; then
   alias grep='ggrep --color=always'
 fi
+
+alias upwez='brew upgrade --cask wezterm-nightly --no-quarantine --greedy-latest'
