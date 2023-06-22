@@ -156,3 +156,4 @@ if [ -f /opt/homebrew/bin/ggrep ]; then
 fi
 
 alias upwez='brew upgrade --cask wezterm-nightly --no-quarantine --greedy-latest'
+alias neovide='/Users/james/src/nvim/neovide/target/release/bundle/osx/Neovide.app/Contents/MacOS/neovide'
