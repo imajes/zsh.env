@@ -54,7 +54,8 @@ zmodule unixorn/1password-op.plugin.zsh #  1password
 zmodule unixorn/git-extra-commands # moar gits moar https://github.com/unixorn/git-extra-commands also, tj/git-extras?
 zmodule unixorn/rake-completion.zshplugin # make the rake the zake
 zmodule agkozak/zsh-z # recent directories - https://github.com/agkozak/zsh-z
-zmodule joke/zim-rtx # integrate rtx
+zmodule joke/zim-mise # integrate mise (was rtx)
+zmodule joke/zim-kubectl # integrate kube
 
 #
 # Prompt
