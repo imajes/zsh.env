@@ -38,6 +38,9 @@ setopt CORRECT
 # Remove path separator from WORDCHARS.
 WORDCHARS=${WORDCHARS//[\/]}
 
+# add local to path
+export PATH=$HOME/.local/bin/:$PATH
+
 # ---------------------------------------------------------------------
 # Zim configuration   -  cheatsheet: https://zimfw.sh/docs/cheatsheet/
 # ---------------------------------------------------------------------
@@ -149,6 +152,7 @@ unset key
 
 # update grep colors - https://dom111.github.io/grep-colors/
 export GREP_COLORS='sl=48;5;236;97:cx=40;37;2:mt=48;5;186;30:fn=49;38;5;197;2:ln=49;38;5;154;1:bn=49;38;5;141:se=49;38;5;81'
+#export GREP_COLORS='sl=49;97:cx=49;37;2:mt=48;5;186;30:fn=49;38;5;197;2:ln=49;38;5;154;1:bn=49;38;5;141:se=49;38;5;81';
 unset GREP_COLOR
 
 if [ -f /opt/homebrew/bin/ggrep ]; then
