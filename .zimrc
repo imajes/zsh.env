@@ -44,7 +44,7 @@ zmodule ohmyzsh/ohmyzsh --root plugins/git-extras
 # zmodule ohmyzsh/ohmyzsh --root plugins/url-quote-magic
 # zmodule ohmyzsh/ohmyzsh --root plugins/git-escape-magic
 zmodule ohmyzsh/ohmyzsh --root plugins/github
-zmodule ohmyzsh/ohmyzsh --root plugins/heroku
+# zmodule ohmyzsh/ohmyzsh --root plugins/heroku -- disabled due to extra compinit
 zmodule ohmyzsh/ohmyzsh --root plugins/keychain
 
 zmodule eventi/noreallyjustfuckingstopalready # macos dns. https://github.com/eventi/noreallyjustfuckingstopalready
