@@ -147,6 +147,9 @@ unset key
 # source environment enhancements
 [[ ! -f $ZDOTDIR/.env_enhancements ]] || source $ZDOTDIR/.env_enhancements
 
+# source portable env overrides
+[[ ! -f $HOME/.zsh_portable-env ]] || source $HOME/.zsh_portable-env
+
 # source local overrides
 [[ ! -f $HOME/.zsh_local ]] || source $HOME/.zsh_local
 
