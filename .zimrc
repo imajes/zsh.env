@@ -20,11 +20,12 @@ zmodule utility
 # Helpers for exa etc
 zmodule exa
 # lets use fzf to help with fuzzyfind
-zmodule fzf
-
+# zmodule fzf
 # Helpers for ruby
 zmodule ruby
-#
+# zoxide, another better way of navigating directories
+zmodule kiesman99/zim-zoxide
+
 #
 # Modules from elsewhere
 #
@@ -37,9 +38,9 @@ zmodule sorin-ionescu/prezto --root modules/spectrum
 zmodule ohmyzsh/ohmyzsh --root plugins/ansible
 zmodule ohmyzsh/ohmyzsh --root plugins/aws
 zmodule ohmyzsh/ohmyzsh --root plugins/battery
+# this should enable homebrew if it's installed
 zmodule ohmyzsh/ohmyzsh --root plugins/brew
 zmodule ohmyzsh/ohmyzsh --root plugins/codeclimate
-zmodule ohmyzsh/ohmyzsh --root plugins/direnv
 zmodule ohmyzsh/ohmyzsh --root plugins/git-extras
 # zmodule ohmyzsh/ohmyzsh --root plugins/url-quote-magic
 # zmodule ohmyzsh/ohmyzsh --root plugins/git-escape-magic
@@ -60,6 +61,11 @@ zmodule joke/zim-kubectl # integrate kube
 zmodule joke/zim-mise
 
 #
+# Behavior
+#
+zmodule run-help
+
+#
 # Prompt
 #
 
@@ -69,6 +75,8 @@ zmodule duration-info
 zmodule git-info
 # use powerlevel10k https://github.com/romkatv/powerlevel10k
 zmodule romkatv/powerlevel10k --use degit
+# formats cwd to use in prompts...
+zmodule prompt-pwd
 
 #
 # Completion
@@ -84,6 +92,8 @@ zmodule completion
 # Modules that must be initialized last
 #
 
+# improve direnv integration - requires brew to be ready
+zmodule direnv
 # Fish-like syntax highlighting for Zsh.
 # zsh-users/zsh-syntax-highlighting must be sourced after completion
 zmodule zsh-users/zsh-syntax-highlighting
