@@ -37,6 +37,7 @@ zmodule sorin-ionescu/prezto --root modules/spectrum
 # zmodule ohmyzsh/ohmyzsh --root plugins/1password
 zmodule ohmyzsh/ohmyzsh --root plugins/ansible
 zmodule ohmyzsh/ohmyzsh --root plugins/aws
+zmodule ohmyzsh/ohmyzsh --root plugins/azure
 zmodule ohmyzsh/ohmyzsh --root plugins/battery
 # this should enable homebrew if it's installed
 zmodule ohmyzsh/ohmyzsh --root plugins/brew
