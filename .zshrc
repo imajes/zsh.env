@@ -39,7 +39,7 @@ setopt CORRECT
 WORDCHARS=${WORDCHARS//[\/]}
 
 # add local to path
-export PATH=$HOME/.local/bin/:$PATH
+export PATH=$HOME/.local/bin:$PATH
 
 # ---------------------------------------------------------------------
 # Zim configuration   -  cheatsheet: https://zimfw.sh/docs/cheatsheet/
@@ -88,7 +88,7 @@ ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 
 # Customize the style that the suggestions are shown with.
 # See https://github.com/zsh-users/zsh-autosuggestions/blob/master/README.md#suggestion-highlight-style
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=228'
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=228'
 
 #
 # zsh-syntax-highlighting
@@ -161,3 +161,6 @@ unset GREP_COLOR
 if [ -f /opt/homebrew/bin/ggrep ]; then
   alias grep='ggrep --color=always'
 fi
+
+# To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
+[[ ! -f ~/.config/zsh/.p10k.zsh ]] || source ~/.config/zsh/.p10k.zsh

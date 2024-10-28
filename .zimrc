@@ -17,8 +17,6 @@ zmodule input
 zmodule termtitle
 # Utility aliases and functions. Adds colour to ls, grep and less.
 zmodule utility
-# Helpers for exa etc
-zmodule exa
 # lets use fzf to help with fuzzyfind
 # zmodule fzf
 # Helpers for ruby
@@ -49,6 +47,8 @@ zmodule ohmyzsh/ohmyzsh --root plugins/github
 # zmodule ohmyzsh/ohmyzsh --root plugins/heroku -- disabled due to extra compinit
 zmodule ohmyzsh/ohmyzsh --root plugins/keychain
 
+zmodule pndurette/zsh-lux # tooling to switch between light/dark views
+
 zmodule eventi/noreallyjustfuckingstopalready # macos dns. https://github.com/eventi/noreallyjustfuckingstopalready
 zmodule peterhurford/git-it-on.zsh # open repo in the websites
 zmodule djui/alias-tips # you got an alias for that bruh
@@ -61,6 +61,8 @@ zmodule joke/zim-kubectl # integrate kube
 # integrate mise for lang management
 zmodule joke/zim-mise
 
+# Helpers for exa etc - make sure after brew
+zmodule exa
 #
 # Behavior
 #
