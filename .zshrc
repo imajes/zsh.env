@@ -149,17 +149,12 @@ unset key
 # source local overrides
 [[ ! -f $HOME/.zsh_local ]] || source $HOME/.zsh_local
 
-# update grep colors - https://dom111.github.io/grep-colors/
-export GREP_COLORS='sl=48;5;236;97:cx=40;37;2:mt=48;5;186;30:fn=49;38;5;197;2:ln=49;38;5;154;1:bn=49;38;5;141:se=49;38;5;81'
-#export GREP_COLORS='sl=49;97:cx=49;37;2:mt=48;5;186;30:fn=49;38;5;197;2:ln=49;38;5;154;1:bn=49;38;5;141:se=49;38;5;81';
-unset GREP_COLOR
-
 # override ls/exa/eza behavior
 alias ls='eza --group-directories-first --icons -g -h'
 alias la='ls -l -a'
 
 if [ -f /opt/homebrew/bin/ggrep ]; then
-  alias grep='ggrep --color=always'
+  alias grep='ggrep --color=auto '
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
