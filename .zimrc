@@ -1,108 +1,108 @@
-#
-# This is not sourced during shell startup, and it's only used to configure the
-# zimfw plugin manager. - use `zimfw install` to deploy
-#
+# ---------------------------------------------------------------------------
+#  .zimrc — module configuration for zimfw (grouped, gated via per-module options)
+# NOTE: After edits, run: `zimfw update && zimfw install && zimfw clean`
+# ---------------------------------------------------------------------------
 
-#
-# Modules
-#
+# Central cache dir for plugins that use $ZSH_CACHE_DIR
+export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 
-# Sets sane Zsh built-in environment options.
-zmodule environment
-# Provides handy git aliases and functions.
-# zmodule git
-# Applies correct bindkeys for input events.
-zmodule input
-# Sets a custom terminal title.
-zmodule termtitle
-# Utility aliases and functions. Adds colour to ls, grep and less.
-zmodule utility
-# lets use fzf to help with fuzzyfind
-# zmodule fzf
-# Helpers for ruby
-zmodule ruby
-# zoxide, another better way of navigating directories
-zmodule kiesman99/zim-zoxide
+export MACOS_OSTYPE=darwin21.3.0
 
-#
-# Modules from elsewhere
-#
-# zmodule ohmyzsh/ohmyzsh --root plugins/mise
+################################################################################
+# 1) Core UX (lightweight, safe defaults)
+################################################################################
 
-zmodule sorin-ionescu/prezto --root modules/command-not-found
-zmodule sorin-ionescu/prezto --root modules/spectrum
+zmodule input                   # sane keybindings
+zmodule termtitle               # pre-set styles in .zshrc pre-init
 
-# zmodule ohmyzsh/ohmyzsh --root plugins/1password
-zmodule ohmyzsh/ohmyzsh --root plugins/ansible
-zmodule ohmyzsh/ohmyzsh --root plugins/aws
-zmodule ohmyzsh/ohmyzsh --root plugins/azure
-zmodule ohmyzsh/ohmyzsh --root plugins/battery
-# this should enable homebrew if it's installed
-zmodule ohmyzsh/ohmyzsh --root plugins/brew
-zmodule ohmyzsh/ohmyzsh --root plugins/codeclimate
-zmodule ohmyzsh/ohmyzsh --root plugins/git-extras
-# zmodule ohmyzsh/ohmyzsh --root plugins/url-quote-magic
-# zmodule ohmyzsh/ohmyzsh --root plugins/git-escape-magic
-zmodule ohmyzsh/ohmyzsh --root plugins/github
-# zmodule ohmyzsh/ohmyzsh --root plugins/heroku -- disabled due to extra compinit
-zmodule ohmyzsh/ohmyzsh --root plugins/keychain
+# 🚫 zmodule environment       # stale; inlined sane defaults in shell_customizations.d
+# zmodule environment         # optional: load default env settings
 
-zmodule pndurette/zsh-lux # tooling to switch between light/dark views
+################################################################################
+# 2) Prompt
+################################################################################
 
-zmodule eventi/noreallyjustfuckingstopalready # macos dns. https://github.com/eventi/noreallyjustfuckingstopalready
-zmodule peterhurford/git-it-on.zsh # open repo in the websites
-zmodule djui/alias-tips # you got an alias for that bruh
-zmodule skx/sysadmin-util # yeah, why not https://github.com/skx/sysadmin-util
-zmodule unixorn/1password-op.plugin.zsh #  1password
-zmodule unixorn/git-extra-commands # moar gits moar https://github.com/unixorn/git-extra-commands also, tj/git-extras?
-zmodule unixorn/rake-completion.zshplugin # make the rake the zake
-zmodule agkozak/zsh-z # recent directories - https://github.com/agkozak/zsh-z
-zmodule joke/zim-kubectl # integrate kube
-# integrate mise for lang management
-zmodule joke/zim-mise
+zmodule romkatv/powerlevel10k --use degit   # p10k includes duration + gitstatus
+zmodule prompt-pwd                          # cwd formatter for prompts
 
-# Helpers for exa etc - make sure after brew
-zmodule exa
-#
-# Behavior
-#
-zmodule run-help
+################################################################################
+# 3) Completion (order matters)
+################################################################################
 
-#
-# Prompt
-#
-
-# Exposes to prompts how long the last command took to execute, used by asciiship.
-zmodule duration-info
-# Exposes git repository status information to prompts, used by asciiship.
-zmodule git-info
-# use powerlevel10k https://github.com/romkatv/powerlevel10k
-zmodule romkatv/powerlevel10k --use degit
-# formats cwd to use in prompts...
-zmodule prompt-pwd
-
-#
-# Completion
-#
-
-# Additional completion definitions for Zsh.
 zmodule zsh-users/zsh-completions --fpath src
-# Enables and configures smart and extensive tab completion.
-# completion must be sourced after all modules that add completion definitions.
 zmodule completion
 
-#
-# Modules that must be initialized last
-#
+# fzf core + enhanced tab completion
+zmodule fzf --if-command fzf
+zmodule Aloxaf/fzf-tab --if-command fzf         # optional; disable if conflicts
 
-# improve direnv integration - requires brew to be ready
-zmodule direnv
-# Fish-like syntax highlighting for Zsh.
-# zsh-users/zsh-syntax-highlighting must be sourced after completion
-zmodule zsh-users/zsh-syntax-highlighting
-# Fish-like history search (up arrow) for Zsh.
-# zsh-users/zsh-history-substring-search must be sourced after zsh-users/zsh-syntax-highlighting
-zmodule zsh-users/zsh-history-substring-search
-# Fish-like autosuggestions for Zsh.
-zmodule zsh-users/zsh-autosuggestions
+################################################################################
+# 4) macOS-specific
+################################################################################
 
+zmodule ohmyzsh/ohmyzsh --root plugins/brew #  --if-command brew
+
+zmodule pndurette/zsh-lux --if-ostype $MACOS_OSTYPE                       # macOS light/dark detection
+zmodule eventi/noreallyjustfuckingstopalready --if-ostype $MACOS_OSTYPE  # macOS DNS reset helpers
+zmodule ohmyzsh/ohmyzsh --root plugins/macos --if-ostype $MACOS_OSTYPE    # macOS utilities
+zmodule ohmyzsh/ohmyzsh --root plugins/keychain --if-ostype $MACOS_OSTYPE
+
+# zmodule sorin-ionescu/prezto --root modules/spectrum --if-ostype $MACOS_OSTYPE  # optional color swatches
+
+################################################################################
+# 5) Sysadmin, secrets, helpers
+################################################################################
+
+zmodule utility                                                 # ⚠️ may churn ls/grep/less aliases
+zmodule exa --if-command eza    # note exa/eza overlap          # ⚠️ may churn ls aliases
+zmodule unixorn/1password-op.plugin.zsh --if-command op
+zmodule skx/sysadmin-util
+
+################################################################################
+# 6) DevOps / Cloud + Language / Tooling
+################################################################################
+
+zmodule joke/zim-mise --if-command mise   # mise version manager
+
+zmodule ruby --if-command ruby
+zmodule unixorn/rake-completion.zshplugin --if-command ruby
+
+zmodule ohmyzsh/ohmyzsh --root plugins/ansible --if-command ansible
+zmodule ohmyzsh/ohmyzsh --root plugins/aws --if-command aws
+zmodule ohmyzsh/ohmyzsh --root plugins/azure --if-command az
+# zmodule ohmyzsh/ohmyzsh --root plugins/docker --if-command docker
+# zmodule ohmyzsh/ohmyzsh --root plugins/docker-compose --if-command docker
+zmodule ohmyzsh/ohmyzsh --root plugins/helm --if-command helm
+zmodule ohmyzsh/ohmyzsh --root plugins/terraform --if-command terraform
+zmodule joke/zim-kubectl --if-command kubectl
+
+################################################################################
+# 7) Git / GitHub tooling
+################################################################################
+
+# zmodule ohmyzsh/ohmyzsh --root plugins/git-extras --if-command git   # choose one
+# zmodule unixorn/git-extra-commands --if-command git
+
+zmodule wfxr/forgit --if-command git --if-command fzf                 # fzf-powered git ops
+# zmodule ohmyzsh/ohmyzsh --root plugins/gh --if-command gh            # gh CLI helpers
+
+################################################################################
+# 8) UX add-ons
+################################################################################
+
+zmodule zdharma-continuum/history-search-multi-word  # multi-word history search
+zmodule MichaelAquilina/zsh-auto-notify             # desktop notifications for long cmds
+
+################################################################################
+# 9) Last to initialize (must be at the end)
+################################################################################
+
+zmodule direnv --if-command direnv                                   # per-dir env - last because zsh needs to be ready.
+zmodule zsh-users/zsh-syntax-highlighting                            # after completion
+zmodule zsh-users/zsh-history-substring-search                       # after highlighting
+zmodule zsh-users/zsh-autosuggestions                                # after autosuggest
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :
+# ---------------------------------------------------------------------------
+#  END .zimrc
+# ---------------------------------------------------------------------------
