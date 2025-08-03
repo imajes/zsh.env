@@ -1,5 +1,6 @@
+# $ZDOTDIR/.zimrc — module configuration for zimfw (grouped, gated via per-module options)
+#
 # ---------------------------------------------------------------------------
-#  .zimrc — module configuration for zimfw (grouped, gated via per-module options)
 # NOTE: After edits, run: `zimfw update && zimfw install && zimfw clean`
 # ---------------------------------------------------------------------------
 
