@@ -16,7 +16,6 @@ zmodule input                   # sane keybindings
 zmodule termtitle               # pre-set styles in .zshrc pre-init
 
 # 🚫 zmodule environment       # stale; inlined sane defaults in shell_customizations.d
-# zmodule environment         # optional: load default env settings
 
 ################################################################################
 # 2) Prompt
@@ -64,7 +63,7 @@ zmodule skx/sysadmin-util
 
 zmodule joke/zim-mise --if-command mise   # mise version manager
 
-zmodule ruby --if-command ruby
+# 🚫 zmodule ruby --if-command ruby # disable due to low value
 zmodule unixorn/rake-completion.zshplugin --if-command ruby
 
 zmodule ohmyzsh/ohmyzsh --root plugins/ansible --if-command ansible

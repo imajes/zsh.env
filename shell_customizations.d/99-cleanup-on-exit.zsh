@@ -1,5 +1,4 @@
-# ---------------------------------------------------------------
-# Project‐specific exit cleanup infrastructure
+# $ZDOTDIR/shell_customizations.d/99-cleanup-on-exit.zsh - Project‐specific exit cleanup infrastructure
 
 # Ensure we have add-zsh-hook available
 autoload -Uz add-zsh-hook

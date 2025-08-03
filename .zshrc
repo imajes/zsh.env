@@ -2,6 +2,8 @@
 #  Zsh setup using $ZDOTDIR/shell_customizations.d/ (ordered, modular)
 # ============================================================================
 
+# zmodload zsh/zprof
+
 # ---------------------------------------------------------------------------
 #  .zshrc  (skeletal — Zim pre-init, then load customizations from directory)
 # ---------------------------------------------------------------------------
@@ -88,5 +90,7 @@ fi
 
 # Host-specific overrides (not under VC)
 [[ -f $HOME/.env_local ]] && source $HOME/.env_local
+
+# zprof
 
 #  vim: set ft=zsh ts=2 sw=2 tw=0 et :

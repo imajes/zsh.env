@@ -6,6 +6,8 @@ path=(
   $HOME/.config/yarn/global/node_modules/.bin
   $path
 )
+
+# enable mise
 export MISE_NODE_COREPACK=true
 
 # Ruby performance & aliases
