@@ -62,7 +62,7 @@ zmodule skx/sysadmin-util
 # 6) DevOps / Cloud + Language / Tooling
 ################################################################################
 
-zmodule joke/zim-mise --if-command mise   # mise version manager
+# zmodule joke/zim-mise # --if-command mise   # mise version manager
 
 # 🚫 zmodule ruby --if-command ruby # disable due to low value
 zmodule unixorn/rake-completion.zshplugin --if-command ruby

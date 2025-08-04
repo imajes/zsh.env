@@ -1,13 +1,47 @@
 # $ZDOTDIR/shell_customizations.d/30-dev.zsh - language & tooling helpers
 
-# Yarn / Node paths
+# Local / Yarn / Node paths
 path=(
+  $HOME/.local/bin
   $HOME/.yarn/bin
   $HOME/.config/yarn/global/node_modules/.bin
   $path
 )
+fpath=("~/.local/share/zsh/site-functions" $fpath)
 
-# enable mise
+# Run only if `mise` exists
+(( ${+commands[mise]} )) && () {
+  local command=${commands[mise]}
+
+  # ---- Cache / activation ----
+  local cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/mise
+  mkdir -p "$cache_dir" "$cache_dir/functions"
+
+  local activatefile="$cache_dir/mise-activate.zsh"
+  if [[ ! -e $activatefile || $activatefile -ot $command ]]; then
+    "$command" activate zsh >| "$activatefile"
+    (( $+commands[zcompile] )) && zcompile -UR "$activatefile"
+  fi
+
+  source "$activatefile"
+  source <("$command" hook-env -s zsh)
+
+  # ---- Completions ----
+  # Prefer a writable directory already in $fpath; fall back to cache_dir/functions
+  local compdir=
+  for d in $fpath; do
+    [[ -w $d ]] && compdir=$d && break
+  done
+  [[ -z $compdir ]] && compdir="$cache_dir/functions" && fpath=("$compdir" $fpath)
+  mkdir -p "$compdir"
+
+  local compfile="$compdir/_mise"
+  if [[ ! -e $compfile || $compfile -ot $command ]]; then
+    "$command" complete --shell zsh >| "$compfile"
+    print -u2 -PR "* Regenerated mise completions in $compdir"
+  fi
+}
+
 export MISE_NODE_COREPACK=true
 
 # Ruby performance & aliases
@@ -26,7 +60,6 @@ export PRY_HISTFILE=.pry_history
 if [[ $(uname) == Darwin ]]; then
   export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 fi
-
 
 # macOS-only Java helpers
 if [[ $(uname) == Darwin ]] && [[ -x /usr/libexec/java_home ]]; then
