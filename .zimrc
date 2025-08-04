@@ -97,7 +97,7 @@ zmodule MichaelAquilina/zsh-auto-notify             # desktop notifications for 
 # 9) Last to initialize (must be at the end)
 ################################################################################
 
-zmodule direnv --if-command direnv                                   # per-dir env - last because zsh needs to be ready.
+# zmodule direnv --if-command direnv                                   # per-dir env - last because zsh needs to be ready.
 zmodule zsh-users/zsh-syntax-highlighting                            # after completion
 zmodule zsh-users/zsh-history-substring-search                       # after highlighting
 zmodule zsh-users/zsh-autosuggestions                                # after autosuggest
