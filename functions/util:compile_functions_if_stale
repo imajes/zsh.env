@@ -1,0 +1,50 @@
+#autoload
+util:compile_functions_if_stale() {
+  local dir=${1:-$ZDOTDIR/functions}
+  [[ -d $dir ]] || return 0
+
+  setopt localoptions extendedglob null_glob
+  local -a src; src=($dir/^*.zwc(.N))
+
+  # Filter to true autoloadables/completions
+  local f first
+  local -a todo
+  for f in $src; do
+    IFS= read -r first < "$f" || continue
+    [[ $first == '#autoload'* || $first == '#compdef'* ]] && todo+=("$f")
+  done
+  (( ${#todo} )) || return 0
+
+  zmodload -F zsh/stat b:zstat 2>/dev/null || return 0
+  autoload -Uz zrecompile 2>/dev/null
+
+  local zwc updated=0
+  for f in $todo; do
+    zwc=$f.zwc
+    # skip if up-to-date
+    if [[ -e $zwc ]]; then
+      local -A Ssrc Szwc
+      zstat -H Ssrc +mtime -- "$f"
+      zstat -H Szwc +mtime -- "$zwc"
+      (( Ssrc[mtime] <= Szwc[mtime] )) && continue
+    fi
+
+    # Try zrecompile -p first (per-file); if it refuses, fall back to zcompile.
+    if zrecompile -p -- "$f" 2>/dev/null; then
+      print -r -- "re-compiled $(basename -- $zwc)"
+      updated=1
+    else
+      # Fallback: compile explicitly to $f.zwc
+      if command -v zcompile >/dev/null && zcompile -- "$zwc" "$f" 2>/dev/null; then
+        print -r -- "compiled via zcompile $(basename -- $zwc)"
+        updated=1
+      else
+        print -r -- "WARN: could not compile $f" >&2
+      fi
+    fi
+  done
+
+  return $updated
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

@@ -15,7 +15,7 @@ export MACOS_OSTYPE=darwin21.3.0
 
 zmodule input                   # sane keybindings
 zmodule termtitle               # pre-set styles in .zshrc pre-init
-
+zmodule romkatv/zsh-defer       # allows us to defer requests till later
 # 🚫 zmodule environment       # stale; inlined sane defaults in shell_customizations.d
 
 ################################################################################

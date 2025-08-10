@@ -1,0 +1,10 @@
+#autoload
+# Internal helper: enforce pins if available & defined
+path:_maybe_enforce_pins() {
+  emulate -L zsh
+  (( ${+PATH_PINS} && ${#PATH_PINS} )) || return 0
+  whence -w path:_enforce_pins >/dev/null || return 0
+  path:_enforce_pins
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

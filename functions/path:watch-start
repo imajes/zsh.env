@@ -1,0 +1,102 @@
+#autoload
+path:watch-start() {
+  emulate -L zsh
+  print -u2 -- "[watch] installing…"
+
+  # if our dispatcher is already in place, do nothing
+  if [[ ${precmd_functions[(r)path:_pw_dispatch_precmd]} ]]; then
+    return 0
+  fi
+
+  typeset -g  _PATH_WATCH_CMD=""
+  typeset -ga _PATH_WATCH_BEFORE
+  typeset -g  _PATH_WATCH_LOG=${PATH_WATCH_LOG:-${XDG_CACHE_HOME:-$HOME/.cache}/zsh/path-watch.log}
+  mkdir -p -- "${_PATH_WATCH_LOG:h}"
+
+  _pw_print_change() {
+    local cause="$1" detail="$2"
+    local -a before=("${(@P)3}") after=("${(@P)4}")
+    local sep=$'\x1f'
+    [[ ${(j:$sep:)before} == ${(j:$sep:)after} ]] && return 0
+    local -a added removed
+    added=(${after:#(${(j:|:)~before})})
+    removed=(${before:#(${(j:|:)~after})})
+
+    print -n $'\a'
+    local ts; ts=$(strftime '%Y-%m-%d %H:%M:%S' $EPOCHSECONDS 2>/dev/null || print -r -- "$EPOCHREALTIME")
+    print -r -- "* PATH changed by: $cause${detail:+ [$detail]} @ $ts"
+    (( ${#added} ))  && printf '  + %s\n' -- "${added[@]}"
+    (( ${#removed} ))&& printf '  - %s\n' -- "${removed[@]}"
+    {
+      print -r -- "[$ts] BY: $cause ${detail:+[$detail]}"
+      (( ${#added} ))  && printf '  + %s\n' -- "${added[@]}"
+      (( ${#removed} ))&& printf '  - %s\n' -- "${removed[@]}"
+      print -r -- "  new PATH:"; printf '    %s\n' -- "${after[@]}"; print -r --
+    } >> "$_PATH_WATCH_LOG"
+  }
+
+  # capture PATH before each external command runs
+  _pw_preexec() {
+    emulate -L zsh
+    _PATH_WATCH_CMD=$1
+    _PATH_WATCH_BEFORE=("${path[@]}")
+  }
+
+  # dispatcher: run precmd hooks one-by-one and diff after each
+  path:_pw_dispatch_precmd() {
+    emulate -L zsh
+    local -a orig before after
+    orig=("${precmd_functions[@]}"); orig=(${orig:#path:_pw_dispatch_precmd})
+    for f in "${orig[@]}"; do
+      before=("${path[@]}")
+      "$f" "$@"
+      after=("${path[@]}")
+      _pw_print_change "precmd hook" "$f" before after
+    done
+    # finally attribute command-level changes since last preexec
+    after=("${path[@]}")
+    _pw_print_change "command" "${_PATH_WATCH_CMD:-<startup>}" _PATH_WATCH_BEFORE after
+    _PATH_WATCH_CMD=""
+    _PATH_WATCH_BEFORE=("${path[@]}")
+  }
+
+  path:_pw_dispatch_chpwd() {
+    emulate -L zsh
+    local -a orig before after
+    orig=("${chpwd_functions[@]}"); orig=(${orig:#path:_pw_dispatch_chpwd})
+    for f in "${orig[@]}"; do
+      before=("${path[@]}")
+      "$f" "$@"
+      after=("${path[@]}")
+      _pw_print_change "chpwd hook" "$f" before after
+    done
+  }
+
+  # install our handlers without add-zsh-hook
+  preexec_functions+=(_pw_preexec)
+  precmd_functions=(path:_pw_dispatch_precmd ${precmd_functions:#path:_pw_dispatch_precmd})
+  chpwd_functions=(path:_pw_dispatch_chpwd  ${chpwd_functions:#path:_pw_dispatch_chpwd})
+}
+
+#autoload
+path:watch-status() {
+  emulate -L zsh
+  if [[ ${precmd_functions[(r)path:_pw_dispatch_precmd]} ]]; then
+    print -r -- "PATH watch: ON (log -> ${_PATH_WATCH_LOG:-${PATH_WATCH_LOG:-${XDG_CACHE_HOME:-$HOME/.cache}/zsh/path-watch.log}})"
+    print -r -- "preexec_functions: ${preexec_functions[*]}"
+    print -r -- "precmd_functions:  ${precmd_functions[*]}"
+    print -r -- "chpwd_functions:   ${chpwd_functions[*]}"
+  else
+    print -r -- "PATH watch: OFF"
+  fi
+}
+
+#autoload
+path:watch-stop() {
+  emulate -L zsh
+  preexec_functions=(${preexec_functions:#_pw_preexec})
+  precmd_functions=(${precmd_functions:#path:_pw_dispatch_precmd})
+  chpwd_functions=(${chpwd_functions:#path:_pw_dispatch_chpwd})
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

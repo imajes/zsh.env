@@ -1,0 +1,17 @@
+#autoload
+path:move_to() {
+  local dir=$1 idx=$2
+  [[ -z $dir || -z $idx ]] && return 1
+  # normalize ~ and remove existing occurrences
+  dir=${~dir}
+  typeset -gU path
+  path=(${path:#$dir})
+  # clamp index
+  (( idx < 1 )) && idx=1
+  local newlen=$(( ${#path} + 1 ))
+  (( idx > newlen )) && idx=$newlen
+  # insert
+  path=(${path[1,$((idx-1))]} $dir ${path[$idx,-1]})
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

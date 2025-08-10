@@ -1,0 +1,59 @@
+#autoload
+path:_enforce_pins() {
+  emulate -L zsh
+  typeset -gU path
+  typeset -gA PATH_PINS
+  (( ${#PATH_PINS} )) || { (( ${+DEBUG_PATH_PINS} )) && print -u2 "[path:_enforce_pins] no pins; skip"; return 0; }
+
+  # tiny debug helper (stderr)
+  local _dbg; _dbg() { (( ${+DEBUG_PATH_PINS} )) && print -u2 -- "$@"; }
+
+  _dbg "[path:_enforce_pins] START"
+  _dbg "[path:_enforce_pins] path: ${(j.:.)path}"
+  _dbg "[path:_enforce_pins] pins (unsorted):"
+  local k v; for k v in "${(@kv)PATH_PINS}"; do _dbg "  $k => $v"; done
+
+  # Build sortable records "index␟dir" (␟ = unit separator)
+  local -a recs
+  local dir idx
+  for dir idx in "${(@kv)PATH_PINS}"; do
+    recs+=("$idx"$'\x1f'"${~dir}")
+  done
+  recs=(${(on)recs})  # ascending numeric sort
+
+  _dbg "[path:_enforce_pins] pins (sorted asc):"
+  local rec; for rec in $recs; do
+    _dbg "  idx=${rec%%$'\x1f'*} dir=${rec#*$'\x1f'}"
+  done
+
+  # Remove pinned dirs -> base
+  local -a rest out
+  rest=("${path[@]}")
+  for rec in $recs; do
+    dir=${rec#*$'\x1f'}
+    rest=(${rest:#$dir})
+  done
+  _dbg "[path:_enforce_pins] rest(after removal): ${(j.:.)rest}"
+
+  # Insert pins at requested positions (1-based)
+  out=()
+  local -i ri=1
+  local rec_idx rec_dir
+  for rec in $recs; do
+    rec_idx=${rec%%$'\x1f'*}
+    rec_dir=${rec#*$'\x1f'}
+    while (( ${#out} < rec_idx - 1 && ri <= ${#rest} )); do
+      out+=("${rest[ri++]}")
+    done
+    out+=("$rec_dir")
+    _dbg "[path:_enforce_pins] inserted $rec_dir at $rec_idx"
+  done
+  (( ri <= ${#rest} )) && out+=("${(@)rest[ri,-1]}")
+
+  _dbg "[path:_enforce_pins] final: ${(j.:.)out}"
+  _dbg "[path:_enforce_pins] END"
+
+  path=("${out[@]}")
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

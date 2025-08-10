@@ -1,0 +1,23 @@
+#autoload
+# Insert BEFORE first match (or append if target not found)
+path:insert_before() {
+  emulate -L zsh
+  typeset -gU path
+  local target=$1 newdir=${~2}         # expand ~ in newdir
+  [[ -z $target || -z $newdir ]] && return 1
+
+  # remove any existing occurrences of newdir
+  path=(${path:#$newdir})
+
+  # index of first target (1-based); if not found, append
+  local i=${path[(i)$target]}
+  if (( i <= ${#path} )); then
+    path=(${path[1,$((i-1))]} $newdir ${path[$i,-1]})
+  else
+    path+=($newdir)
+  fi
+
+  path:_maybe_enforce_pins
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

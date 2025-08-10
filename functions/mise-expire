@@ -1,0 +1,106 @@
+
+#autoload
+mise:cache-dir() {
+  print -r -- "${XDG_CACHE_HOME:-$HOME/.cache}/mise"
+}
+
+#autoload
+mise:env-cache-dir() {
+  print -r -- "$(mise:cache-dir)/env"
+}
+
+#autoload
+mise:cache-nuke() {
+  emulate -L zsh
+  local scope=env dry=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --env)        scope=env ;;
+      --activate)   scope=activate ;;
+      --completions)scope=completions ;;
+      --all)        scope=all ;;
+      --dry-run)    dry=1 ;;
+      -h|--help)
+        cat <<'USAGE'
+Usage: mise:cache-nuke [--env|--activate|--completions|--all] [--dry-run]
+  --env         Remove env caches (~/.cache/mise/env)      (default)
+  --activate    Remove activate cache file
+  --completions Remove cached _mise completion file(s)
+  --all         Remove all of the above
+  --dry-run     Show what would be removed
+USAGE
+        return 0;;
+    esac
+    shift
+  done
+
+  local root="$(mise:cache-dir)"
+  local envd="$root/env"
+  local activate="$root/mise-activate.zsh"
+  local compdir
+  # Best-effort guess: either a writable fpath component or our cache/functions
+  for d in $fpath; do [[ -w $d ]] && { compdir=$d; break; } done
+  [[ -z $compdir ]] && compdir="$root/functions"
+
+  local targets=()
+  case $scope in
+    env)         [[ -d $envd ]] && targets+=("$envd") ;;
+    activate)    [[ -e $activate ]] && targets+=("$activate") ;;
+    completions) [[ -e $compdir/_mise ]] && targets+=("$compdir/_mise") ;;
+    all)
+      [[ -d $envd ]]      && targets+=("$envd")
+      [[ -e $activate ]]  && targets+=("$activate")
+      [[ -e $compdir/_mise" ]] && targets+=("$compdir/_mise")
+      ;;
+  esac
+
+  if (( ${#targets} == 0 )); then
+    print -r -- "mise:cache-nuke: nothing to remove for scope '$scope'"
+    return 0
+  fi
+
+  print -r -- "mise:cache-nuke targets:"
+  printf '  %s\n' $targets
+
+  (( dry )) && return 0
+
+  # Safety: refuse to touch '/' or empty strings
+  for t in $targets; do
+    [[ -n $t && $t != / ]] || { print -r -- "Refusing to remove '$t'"; return 1; }
+  done
+
+  # Remove files/dirs
+  for t in $targets; do
+    rm -rf -- "$t"
+  done
+
+  # Recreate env dir so subsequent writes succeed
+  [[ $scope == env || $scope == all ]] && mkdir -p -- "$envd"
+
+  print -r -- "mise:cache-nuke done."
+}
+
+#autoload
+mise:cache-prune() {
+  emulate -L zsh
+  local days=${1:-14}
+  local envd="$(mise:env-cache-dir)"
+  [[ -d $envd ]] || { print -r -- "No env cache dir: $envd"; return 0; }
+  # macOS: use -mtime; GNU find compatible too
+  find "$envd" -type f -name '*.zsh' -mtime +"$days" -print -delete 2>/dev/null \
+    || print -r -- "Prune skipped (no compatible 'find'?)."
+}
+
+#autoload
+mise:cache-refresh-here() {
+  emulate -L zsh
+  # Nuke just the current project's cached env (if any), then re-apply
+  local cfg; cfg=$(_mise_find_cfg_cached) || { print -r -- "No project config here."; return 0; }
+  local envd="$(mise:env-cache-dir)"; mkdir -p -- "$envd"
+  zmodload -F zsh/stat b:zstat 2>/dev/null || return 1
+  local -A S; zstat -H S +mtime -- "$cfg" || return 1
+  local key="${${cfg:A}//\//__}.$S[mtime]"
+  rm -f -- "$envd/$key.zsh"
+  _mise_env_apply_for_pwd
+  print -r -- "Refreshed env for: $cfg"
+}

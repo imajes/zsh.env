@@ -23,13 +23,15 @@ bindkey -e
 # WORDCHARS tweak (stop at / on Ctrl-w)
 WORDCHARS=${WORDCHARS//[\/]}
 
-# PATH (deduplicated)
-typeset -U path PATH
+
 path=(
-  $HOME/.local/bin
   $HOME/bin
+  $HOME/.local/bin
   $path
 )
+
+path:always_keep_at $HOME/bin 1
+path:always_keep_at $HOME/.local/bin 2
 
 # Generic aliases with feature detection
 if (( $+commands[eza] )); then

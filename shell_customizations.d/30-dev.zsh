@@ -1,46 +1,41 @@
 # $ZDOTDIR/shell_customizations.d/30-dev.zsh - language & tooling helpers
 
-# Local / Yarn / Node paths
-path=(
-  $HOME/.local/bin
-  $HOME/.yarn/bin
-  $HOME/.config/yarn/global/node_modules/.bin
-  $path
-)
-fpath=("~/.local/share/zsh/site-functions" $fpath)
+# Yarn / Node paths
+path:insert_before /opt/homebrew/bin $HOME/.yarn/bin
+path:insert_before /opt/homebrew/bin $HOME/.config/yarn/global/node_modules/.bin
 
-# Run only if `mise` exists
-(( ${+commands[mise]} )) && () {
-  local command=${commands[mise]}
-
-  # ---- Cache / activation ----
-  local cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/mise
-  mkdir -p "$cache_dir" "$cache_dir/functions"
-
-  local activatefile="$cache_dir/mise-activate.zsh"
-  if [[ ! -e $activatefile || $activatefile -ot $command ]]; then
-    "$command" activate zsh >| "$activatefile"
-    (( $+commands[zcompile] )) && zcompile -UR "$activatefile"
-  fi
-
-  source "$activatefile"
-  source <("$command" hook-env -s zsh)
-
-  # ---- Completions ----
-  # Prefer a writable directory already in $fpath; fall back to cache_dir/functions
-  local compdir=
-  for d in $fpath; do
-    [[ -w $d ]] && compdir=$d && break
-  done
-  [[ -z $compdir ]] && compdir="$cache_dir/functions" && fpath=("$compdir" $fpath)
-  mkdir -p "$compdir"
-
-  local compfile="$compdir/_mise"
-  if [[ ! -e $compfile || $compfile -ot $command ]]; then
-    "$command" complete --shell zsh >| "$compfile"
-    print -u2 -PR "* Regenerated mise completions in $compdir"
-  fi
-}
+# # Run only if `mise` exists
+# (( ${+commands[mise]} )) && () {
+#   local command=${commands[mise]}
+#
+#   # ---- Cache / activation ----
+#   local cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/mise
+#   mkdir -p "$cache_dir" "$cache_dir/functions"
+#
+#   local activatefile="$cache_dir/mise-activate.zsh"
+#   if [[ ! -e $activatefile || $activatefile -ot $command ]]; then
+#     "$command" activate zsh >| "$activatefile"
+#     (( $+commands[zcompile] )) && zcompile -UR "$activatefile"
+#   fi
+#
+#   source "$activatefile"
+#   source <("$command" hook-env -s zsh)
+#
+#   # ---- Completions ----
+#   # Prefer a writable directory already in $fpath; fall back to cache_dir/functions
+#   local compdir=
+#   for d in $fpath; do
+#     [[ -w $d ]] && compdir=$d && break
+#   done
+#   [[ -z $compdir ]] && compdir="$cache_dir/functions" && fpath=("$compdir" $fpath)
+#   mkdir -p "$compdir"
+#
+#   local compfile="$compdir/_mise"
+#   if [[ ! -e $compfile || $compfile -ot $command ]]; then
+#     "$command" complete --shell zsh >| "$compfile"
+#     print -u2 -PR "* Regenerated mise completions in $compdir"
+#   fi
+# }
 
 export MISE_NODE_COREPACK=true
 
@@ -64,13 +59,13 @@ fi
 # macOS-only Java helpers
 if [[ $(uname) == Darwin ]] && [[ -x /usr/libexec/java_home ]]; then
   export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-  path=( /opt/homebrew/opt/openjdk/bin $path )
+  path:insert_before /opt/homebrew/bin /opt/homebrew/opt/openjdk/bin
   export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"
 fi
 
 # acme.sh path if present
 if [[ -d $HOME/.acme.sh ]]; then
-  path=( $HOME/.acme.sh $path )
+  path:insert_before /opt/homebrew/opt/openjdk/bin $HOME/.acme.sh
 fi
 
 # Angular CLI completion (optional)
@@ -85,7 +80,9 @@ fi
 # export MAX_LOCKED_MEMORY=32m
 
 # # go related
-# export GOPATH=~/src/go
+export GOPATH=~/src/go
+path:insert_before /opt/homebrew/opt/openjdk/bin $HOME/src/go/bin
+
 # export GOBIN=$GOPATH/bin
 # export GO15VENDOREXPERIMENT=1
 # export PATH=$GOPATH/bin:$PATH

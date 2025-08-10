@@ -1,0 +1,12 @@
+#autoload
+path:always_keep_at() {
+  local dir=$1 idx=$2
+  [[ -z $dir || -z $idx ]] && return 1
+  dir=${~dir}
+  # store desired position; associative map: dir -> index
+  typeset -gA PATH_PINS
+  PATH_PINS[$dir]=$idx
+  path:_enforce_pins
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

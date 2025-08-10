@@ -27,8 +27,12 @@ setopt HIST_EXPIRE_DUPS_FIRST     # When trimming history, remove older duplicat
 
 # Atuin: magical history (keep near HISTFILE so it owns the stack)
 # Docs: https://atuin.sh
-if [[ -f $HOME/.atuin/bin/env ]]; then
-  source $HOME/.atuin/bin/env
+# if [[ -f $HOME/.atuin/bin/env ]]; then
+#   source $HOME/.atuin/bin/env
+# fi
+# Put atuin bin on PATH (zsh-safe, no duplicates)
+if (( ! ${path[(Ie)$HOME/.atuin/bin]} )); then
+  path:insert_before /opt/homebrew/bin $HOME/.atuin/bin
 fi
 if (( $+commands[atuin] )); then
   eval "$(atuin init zsh)"

@@ -12,6 +12,7 @@
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+[[ -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] && source ${ZDOTDIR:-$HOME}/.p10k.zsh
 
 # -------------------- Zim bootstrap --------------------
 ZIM_HOME=${ZDOTDIR:-$HOME}/.zim
@@ -33,7 +34,7 @@ fi
 # ---------------------------------------------------------------------
 
 # Use degit instead of git as the default tool to install and update modules.
-# zstyle ':zim:zmodule' use 'degit'
+zstyle ':zim:zmodule' use 'degit'
 
 # --------------------
 # Module configuration (MUST be set before init)
@@ -79,18 +80,22 @@ ZSH_HIGHLIGHT_STYLES[comment]='fg=242'
 # Initialize modules (must come AFTER the zstyles above)
 source $ZIM_HOME/init.zsh
 
+# export DEBUG_ZDOT=true
+# source $ZDOTDIR/shell_customizations.d/00-utils.zsh
+
 # -------------------- Load customizations (ordered) ------------------
 # Files are sourced in lexicographic order. Set DEBUG_ZDOT=1 to echo loads.
+
 if [[ -d $ZDOTDIR/shell_customizations.d ]]; then
-  for f in $ZDOTDIR/shell_customizations.d/(*.zsh)(NOn); do
+  for f in $ZDOTDIR/shell_customizations.d/(*.zsh)(Non); do
     (( ${+DEBUG_ZDOT} )) && echo "sourcing $f" >&2
     source "$f"
   done
 fi
-
 # Host-specific overrides (not under VC)
 [[ -f $HOME/.env_local ]] && source $HOME/.env_local
 
+# print -rl -- "DEFINITELY AT THE END OF THE ZSH, HANDING BACK CONTROL...."
 # zprof
 
 #  vim: set ft=zsh ts=2 sw=2 tw=0 et :
