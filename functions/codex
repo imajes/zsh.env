@@ -1,0 +1,163 @@
+#autoload
+#compdef codex
+# JIT + cached launcher for your Codex Rust workspace with dynamic RUST_LOG
+# Options:
+#   -p <path>   : workspace root (defaults to $CODEX_BASE or $HOME/src/artificial_intelligence/codex/codex-rs)
+#   -c <level>  : log level for your crates (defaults to $CODEX_CRATE_LEVEL or "trace")
+#   -b <level>  : base level for everything else (defaults to $CODEX_BASE_LEVEL or "warn")
+#   -B <bin>    : path to compiled codex binary (defaults to $CODEX_BIN or auto-detect under target/)
+#   -r          : force refresh cache
+#   -s          : print computed RUST_LOG and exit (don’t run binary)
+#
+# Env overrides:
+#   CODEX_BASE, CODEX_CRATE_LEVEL, CODEX_BASE_LEVEL, CODEX_BIN, XDG_CACHE_HOME
+
+codex() {
+  emulate -L zsh -o pipefail -o no_aliases
+
+  local base="${CODEX_BASE:-$HOME/src/artificial_intelligence/codex/codex-rs}"
+  local crate_level="${CODEX_CRATE_LEVEL:-trace}"
+  local base_level="${CODEX_BASE_LEVEL:-warn}"
+  local bin="${CODEX_BIN:-}"
+  local force_refresh=0 show_only=0
+
+  local OPTIND opt
+  while getopts ":p:c:b:B:rs" opt; do
+    case $opt in
+      p) base="$OPTARG" ;;
+      c) crate_level="$OPTARG" ;;
+      b) base_level="$OPTARG" ;;
+      B) bin="$OPTARG" ;;
+      r) force_refresh=1 ;;
+      s) show_only=1 ;;
+      \?) print -u2 "codex: unknown option -$OPTARG"; return 2 ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # Resolve binary if not provided
+  if [[ -z "$bin" ]]; then
+    if   [[ -x "$base/target/aarch64-apple-darwin/release/codex" ]]; then
+      bin="$base/target/aarch64-apple-darwin/release/codex"
+    elif [[ -x "$base/target/release/codex" ]]; then
+      bin="$base/target/release/codex"
+    else
+      bin="$base/target/aarch64-apple-darwin/release/codex"  # best-guess default
+    fi
+  fi
+
+  local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/codex-log"
+  mkdir -p "$cache_dir" || return 1
+  local key="${base//\//__}__${crate_level}__${base_level}__v1"
+  local spec_file="$cache_dir/$key.spec"
+  local digest_file="$cache_dir/$key.digest"
+
+  # One Python process computes a digest (paths+mtimes of Cargo.toml) and a spec
+  local out digest computed_spec spec
+  out="$(python3 - "$base" "$crate_level" "$base_level" << 'PY'
+import os, re, sys, hashlib, subprocess
+
+base = os.path.abspath(sys.argv[1])
+crate_level = sys.argv[2]
+base_level  = sys.argv[3]
+
+SKIP = {"target","test","tests"}
+SECTION = re.compile(r'^\s*\[(?P<s>[^\]]+)\]\s*$')
+NAME    = re.compile(r'^\s*name\s*=\s*([\'"])(?P<v>[^\'"]+)\1\s*$')
+
+def cargo_files_via_git(base):
+    try:
+        raw = subprocess.check_output(
+            ["git","-C",base,"ls-files","-z","**/Cargo.toml"],
+            stderr=subprocess.DEVNULL
+        )
+        rels = [p for p in raw.decode("utf-8","ignore").split("\0") if p]
+        out = []
+        for r in rels:
+            p = os.path.join(base, r)
+            parts = set(os.path.normpath(p).split(os.sep))
+            if parts & SKIP:
+                continue
+            if os.path.abspath(p) == os.path.join(base, "Cargo.toml"):
+                continue
+            out.append(os.path.abspath(p))
+        return out
+    except Exception:
+        return None
+
+def cargo_files_via_walk(base):
+    out = []
+    for dp, dn, fn in os.walk(base):
+        dn[:] = [d for d in dn if d not in SKIP]
+        if "Cargo.toml" in fn:
+            p = os.path.join(dp, "Cargo.toml")
+            if os.path.abspath(p) == os.path.join(base, "Cargo.toml"):
+                continue
+            out.append(os.path.abspath(p))
+    return out
+
+files = cargo_files_via_git(base) or cargo_files_via_walk(base)
+
+# Fingerprint: stable over set of Cargo.toml paths + mtimes
+h = hashlib.sha1()
+for p in sorted(files):
+    st = os.stat(p)
+    h.update(p.encode())
+    h.update(str(int(st.st_mtime)).encode())
+digest = h.hexdigest()
+
+def pkg_name(p):
+    in_pkg = False
+    with open(p, 'r', encoding='utf-8') as f:
+        for raw in f:
+            line = raw.split('#', 1)[0].rstrip()
+            m = SECTION.match(line)
+            if m:
+                in_pkg = (m.group('s').strip().lower() == 'package')
+                continue
+            if in_pkg:
+                m = NAME.match(line)
+                if m:
+                    return m.group('v')
+    return None
+
+seen = set()
+targets = []
+for p in files:
+    n = pkg_name(p)
+    if not n:
+        continue
+    t = n.replace('-', '_')
+    if t not in seen:
+        seen.add(t)
+        targets.append(t)
+
+spec = ",".join([base_level] + [f"{t}={crate_level}" for t in targets])
+print(digest)
+print(spec)
+PY
+)" || return $?
+
+  digest="${out%%$'\n'*}"
+  computed_spec="${out#*$'\n'}"
+
+  if (( force_refresh == 0 )) && [[ -f "$digest_file" && -f "$spec_file" ]] && [[ "$(cat "$digest_file")" == "$digest" ]]; then
+    spec="$(<"$spec_file")"
+  else
+    spec="$computed_spec"
+    print -r -- "$digest" >| "$digest_file"
+    print -r -- "$spec"   >| "$spec_file"
+  fi
+
+  if (( show_only )); then
+    print -r -- "$spec"
+    return 0
+  fi
+
+  if [[ ${DEBUG_CODEX_LOGS:l} == (true|1|yes) ]]; then
+    echo "RUST LOG SPEC IS $spec"
+  fi
+
+  RUST_LOG="$spec" "$bin" "$@"
+}
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

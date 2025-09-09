@@ -63,6 +63,13 @@ if [[ $(uname) == Darwin ]] && [[ -x /usr/libexec/java_home ]]; then
   export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"
 fi
 
+# rust: rustup/cargo related.
+path:insert_before $HOME/.yarn/bin $(rustc --print sysroot)/bin
+
+# rust: completions
+# rustup completions zsh
+# rustup completions zsh cargo
+
 # acme.sh path if present
 if [[ -d $HOME/.acme.sh ]]; then
   path:insert_before /opt/homebrew/opt/openjdk/bin $HOME/.acme.sh
