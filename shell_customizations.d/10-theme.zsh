@@ -1,17 +1,24 @@
 # $ZDOTDIR/shell_customizations.d/10-theme.zsh - dark/light detection & colours
 
-# Use caller-provided macos_is_dark() if present; otherwise fallback to LIGHT.
+# Resolve LIGHT_MODE from the environment when provided (e.g. forwarded over SSH),
+# otherwise use macOS AppleInterfaceStyle where available, else default to LIGHT.
 update_theme() {
-  dark_override=false
+  local mode="${LIGHT_MODE:-}"
 
-  dark=0
-  if $dark_override; then
-    dark=1
-  elif typeset -f macos_is_dark >/dev/null && macos_is_dark; then
-    dark=1
+  if [[ -z $mode ]]; then
+    if [[ $(uname) == Darwin ]] && command -v defaults >/dev/null 2>&1; then
+      local style
+      if style=$(defaults read -g AppleInterfaceStyle 2>/dev/null); then
+        [[ ${style:l} == dark ]] && mode='DARK' || mode='LIGHT'
+      else
+        mode='LIGHT'
+      fi
+    else
+      mode='LIGHT'
+    fi
   fi
 
-  if (( dark )); then
+  if [[ ${mode:u} == DARK ]]; then
     export LIGHT_MODE='DARK'
     export BAT_THEME='Visual Studio Dark+'
     export GREP_COLORS='sl=49;38;5;247;2:cx=49;38;5;242;2:mt=48;5;197;38;5;222;1;4:fn=49;38;5;199;2:ln=49;38;5;199;2:bn=49;38;5;141;2:se=49;38;5;81;1'
@@ -24,9 +31,10 @@ update_theme() {
   fi
 }
 
-# macOS: run on every prompt; elsewhere rely on LIGHT_MODE or your own hook
+# macOS: run on every prompt so theme tracks system appearance;
+# on other hosts, run once at startup using the current LIGHT_MODE.
 [[ $(uname) == Darwin ]] && precmd() { update_theme }
-: "${LIGHT_MODE:=LIGHT}"
+update_theme
 
 # Load Powerlevel10k prompt (after theme vars)
 [[ -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] && source ${ZDOTDIR:-$HOME}/.p10k.zsh

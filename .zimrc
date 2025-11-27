@@ -42,7 +42,7 @@ zmodule Aloxaf/fzf-tab --if-command fzf         # optional; disable if conflicts
 
 zmodule ohmyzsh/ohmyzsh --root plugins/brew #  --if-command brew
 
-zmodule pndurette/zsh-lux --if-ostype $MACOS_OSTYPE                       # macOS light/dark detection
+# zmodule pndurette/zsh-lux --if-ostype $MACOS_OSTYPE                       # macOS light/dark detection
 zmodule eventi/noreallyjustfuckingstopalready --if-ostype $MACOS_OSTYPE  # macOS DNS reset helpers
 zmodule ohmyzsh/ohmyzsh --root plugins/macos --if-ostype $MACOS_OSTYPE    # macOS utilities
 zmodule ohmyzsh/ohmyzsh --root plugins/keychain --if-ostype $MACOS_OSTYPE
