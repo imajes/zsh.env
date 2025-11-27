@@ -1,3 +1,5 @@
+#autoload
+#compdef files-from
 # ~/.zshrc
 # Find files whose mtime/ctime fall within a decade or year range.
 # Usage:

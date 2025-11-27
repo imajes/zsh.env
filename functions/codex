@@ -3,21 +3,21 @@
 # JIT + cached launcher for your Codex Rust workspace with dynamic RUST_LOG
 # Options:
 #   -p <path>   : workspace root (defaults to $CODEX_BASE or $HOME/src/artificial_intelligence/codex/codex-rs)
-#   -c <level>  : log level for your crates (defaults to $CODEX_CRATE_LEVEL or "trace")
-#   -b <level>  : base level for everything else (defaults to $CODEX_BASE_LEVEL or "warn")
+#   -c <level>  : log level for your crates (defaults to $CODEX_CRATE_LOG_LEVEL or "info")
+#   -b <level>  : base level for everything else (defaults to $CODEX_BASE_LOG_LEVEL or "info")
 #   -B <bin>    : path to compiled codex binary (defaults to $CODEX_BIN or auto-detect under target/)
 #   -r          : force refresh cache
 #   -s          : print computed RUST_LOG and exit (don’t run binary)
 #
 # Env overrides:
-#   CODEX_BASE, CODEX_CRATE_LEVEL, CODEX_BASE_LEVEL, CODEX_BIN, XDG_CACHE_HOME
+#   CODEX_BASE, CODEX_CRATE_LOG_LEVEL, CODEX_BASE_LOG_LEVEL, CODEX_BIN, XDG_CACHE_HOME
 
 codex() {
   emulate -L zsh -o pipefail -o no_aliases
 
   local base="${CODEX_BASE:-$HOME/src/artificial_intelligence/codex/codex-rs}"
-  local crate_level="${CODEX_CRATE_LEVEL:-trace}"
-  local base_level="${CODEX_BASE_LEVEL:-warn}"
+  local crate_level="${CODEX_CRATE_LOG_LEVEL:-info}"
+  local base_level="${CODEX_BASE_LOG_LEVEL:-info}"
   local bin="${CODEX_BIN:-}"
   local force_refresh=0 show_only=0
 

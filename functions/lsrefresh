@@ -1,0 +1,10 @@
+#autoload
+#compdef lsrefresh
+lsrefresh() {
+  local LS=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+  "$LS" -gc
+  "$LS" -R -f -apps u,s,l
+  "$LS" -R -f -libs u,s,l
+  killall lsd 2>/dev/null || true
+  echo "Launch Services compacted & refreshed."
+}
