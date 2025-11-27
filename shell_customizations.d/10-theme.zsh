@@ -1,12 +1,19 @@
 # $ZDOTDIR/shell_customizations.d/10-theme.zsh - dark/light detection & colours
 
-# Resolve LIGHT_MODE from the environment when provided (e.g. forwarded over SSH),
-# otherwise use macOS AppleInterfaceStyle where available, else default to LIGHT.
+# On macOS interactive shells, track the current system appearance on every
+# prompt. In "portable" environments (SSH, containers, CI) honour LIGHT_MODE
+# from the environment instead, so it can be forwarded from the local host.
 update_theme() {
-  local mode="${LIGHT_MODE:-}"
+  local mode
 
-  if [[ -z $mode ]]; then
+  # Portable / remote shells: prefer explicit LIGHT_MODE, else default LIGHT.
+  if [[ -n $SSH_CONNECTION || -f /.dockerenv ]]; then
+    mode="${LIGHT_MODE:-LIGHT}"
+  else
+    # Local shells.
     if [[ $(uname) == Darwin ]] && command -v defaults >/dev/null 2>&1; then
+      # On macOS, always query the current interface style so existing shells
+      # follow system dark/light mode changes.
       local style
       if style=$(defaults read -g AppleInterfaceStyle 2>/dev/null); then
         [[ ${style:l} == dark ]] && mode='DARK' || mode='LIGHT'
@@ -14,7 +21,8 @@ update_theme() {
         mode='LIGHT'
       fi
     else
-      mode='LIGHT'
+      # Non-macOS local shells: fall back to LIGHT_MODE or LIGHT.
+      mode="${LIGHT_MODE:-LIGHT}"
     fi
   fi
 
