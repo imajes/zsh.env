@@ -1,0 +1,25 @@
+#autoload
+portable:osc7_cwd() {
+  emulate -L zsh
+
+  # Only bother in interactive shells
+  [[ -o interactive ]] || return 0
+
+  # Allow opt-out or skip for very minimal terminals
+  [[ -n ${OSC7_DISABLE:-} ]] && return 0
+  [[ $TERM == (dumb|linux) ]] && return 0
+
+  local host path url_path
+  host=${OSC7_HOST:-$HOST}
+  path=$PWD
+
+  # Very small, cheap URL-style escaping for common cases
+  url_path=${path// /%20}
+  url_path=${url_path//#/%23}
+
+  # OSC 7: report current working directory
+  printf '\e]7;file://%s%s\a' "$host" "$url_path"
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :
+

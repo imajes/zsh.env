@@ -1,0 +1,25 @@
+#autoload
+portable:osc7_status() {
+  emulate -L zsh
+
+  local host="${OSC7_HOST:-$HOST}"
+  local disable="${OSC7_DISABLE:-<unset>}"
+
+  local has_precmd has_chpwd
+  has_precmd=${precmd_functions[(r)portable:osc7_cwd]}
+  has_chpwd=${chpwd_functions[(r)portable:osc7_cwd]}
+
+  if [[ -n $has_precmd || -n $has_chpwd ]]; then
+    print -r -- "OSC7 portable: ON"
+  else
+    print -r -- "OSC7 portable: OFF (portable:osc7_cwd not hooked into precmd/chpwd)"
+  fi
+
+  print -r -- "  host:           $host"
+  print -r -- "  OSC7_DISABLE:   $disable"
+  print -r -- "  precmd_functions: ${precmd_functions[*]}"
+  print -r -- "  chpwd_functions:  ${chpwd_functions[*]}"
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :
+
