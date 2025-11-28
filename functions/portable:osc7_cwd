@@ -13,13 +13,14 @@ portable:osc7_cwd() {
   host=${OSC7_HOST:-$HOST}
   path=$PWD
 
-  # Very small, cheap URL-style escaping for common cases
+  # Very small, cheap URL-style escaping for common cases: encode spaces
+  # and literal '#' characters inside the path.
   url_path=${path// /%20}
   url_path=${url_path//#/%23}
 
-  # OSC 7: report current working directory
-  printf '\e]7;file://%s%s\a' "$host" "$url_path"
+  # OSC 7: report current working directory as a canonical file:// URL.
+  # Use ST (ESC \) terminator for compatibility with most terminals.
+  printf '\033]7;file://%s%s\033\\' "$host" "$url_path"
 }
 
 #  vim: set ft=zsh ts=2 sw=2 tw=0 et :
-
