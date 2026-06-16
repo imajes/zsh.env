@@ -28,12 +28,12 @@ update_theme() {
 
   if [[ ${mode:u} == DARK ]]; then
     export LIGHT_MODE='DARK'
-    export BAT_THEME='Visual Studio Dark+'
+    # export BAT_THEME='Visual Studio Dark+'
     export GREP_COLORS='sl=49;38;5;247;2:cx=49;38;5;242;2:mt=48;5;197;38;5;222;1;4:fn=49;38;5;199;2:ln=49;38;5;199;2:bn=49;38;5;141;2:se=49;38;5;81;1'
     ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=228'
   else
     export LIGHT_MODE='LIGHT'
-    export BAT_THEME='Coldark-Cold'
+    # export BAT_THEME='Coldark-Cold'
     export GREP_COLORS='sl=49;38;5;242;2:cx=49;38;5;247;2:mt=48;5;222;38;5;197;1;4:fn=49;38;5;199;2:ln=49;38;5;199;2:bn=49;38;5;141;2:se=49;38;5;81;1'
     ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=090'
   fi

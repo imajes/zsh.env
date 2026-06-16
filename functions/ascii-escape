@@ -1,0 +1,19 @@
+#autoload
+#compdef ascii_escape
+ascii_escape() {
+  perl -pe '
+    BEGIN { $| = 1 }
+
+    # Decode textual ESC forms into a real ESC byte:
+    #   \u001b, \\u001b, \u{001b}, \\u{001B}, etc.
+    s/\\+u(?:\{)?0*1b(?:\})?/\x1b/ig;
+
+    # Also handle \x1b forms (sometimes show up in logs)
+    s/\\+x0*1b/\x1b/ig;
+
+    # Optional: expand textual newlines (one or more backslashes)
+    s/\\+n/\n/g;
+  '
+}
+
+#  vim: set ft=zsh ts=2 sw=2 tw=0 et :
