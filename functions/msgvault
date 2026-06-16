@@ -1,0 +1,23 @@
+#autoload
+msgvault() {
+  emulate -L zsh
+
+  local msgvault_bin="${MSGVAULT_BIN:-/usr/local/bin/msgvault}"
+  local client_secret="$HOME/.config/msgvault/client_secret.json"
+  local restore_helper="$HOME/bin/restore-msgvault-client-secret.zsh"
+
+  if [[ ! -x "$msgvault_bin" ]]; then
+    print -u2 "msgvault binary not found or not executable: $msgvault_bin"
+    return 127
+  fi
+
+  if [[ ! -r "$client_secret" ]]; then
+    if [[ ! -x "$restore_helper" ]]; then
+      print -u2 "msgvault client secret is missing and restore helper is unavailable: $restore_helper"
+      return 1
+    fi
+    "$restore_helper" >/dev/null || return
+  fi
+
+  "$msgvault_bin" "$@"
+}
