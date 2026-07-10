@@ -2,7 +2,7 @@
 msgvault() {
   emulate -L zsh
 
-  local msgvault_bin="${MSGVAULT_BIN:-/usr/local/bin/msgvault}"
+  local msgvault_bin="${MSGVAULT_BIN:-/opt/homebrew/bin/msgvault}"
   local client_secret="$HOME/.config/msgvault/client_secret.json"
   local restore_helper="$HOME/bin/restore-msgvault-client-secret.zsh"
 
