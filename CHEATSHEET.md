@@ -20,7 +20,7 @@
 **powerlevel10k** (`romkatv/powerlevel10k`)
 
 - Fast, customizable prompt with git status and command duration.
-- Tweak via `~/.p10k.zsh`.
+- Tweak via `$ZDOTDIR/.p10k.zsh`.
 
 **prompt-pwd**
 
@@ -31,7 +31,7 @@
 **zsh-completions**
 
 - Community-maintained completions for many CLI tools.
-- Installed to `${ZDOTDIR}/src`.
+- Installed under `$ZDOTDIR/.zim/modules/zsh-completions/src`.
 
 **completion**
 
@@ -49,10 +49,6 @@
 **brew** plugin
 
 - Auto-suggest `brew install <formula>` when command not found.
-
-**zsh-lux**
-
-- `macos_is_dark` function for light/dark theme detection.
 
 **noreallyjustfuckingstopalready**
 
@@ -138,7 +134,6 @@
 
 ## 9. Final Init (Order Matters)
 
-- **direnv** ― `direnv allow`/`direnv deny` per-directory env.
 - **zsh-syntax-highlighting** ― Real-time syntax colors.
 - **zsh-history-substring-search** ― `↑`/`↓` through history substrings.
 - **zsh-autosuggestions** ― Inline suggestions; accept with `<→>`.
@@ -169,7 +164,7 @@
 
 - Ctrl-R uses Atuin when installed; otherwise Zim multi-word search remains available. Up/Down and Ctrl-P/Ctrl-N use substring search. Re-sourcing history configuration does not reinitialize Atuin.
 
-- `atuin init zsh` for searchable, remote-synced history.
+- Atuin provides searchable history; synchronization and privacy depend on its own configuration.
 
 ### Dev Environment Variables
 
@@ -193,4 +188,8 @@
 
 ---
 
-**Save this as `CHEATSHEET.md` in your dotfiles repo and refer to it whenever you add or update modules.**
+See [README.md](README.md) for startup/cache ownership, isolated validation, and maintenance boundaries.
+
+`path:watch-start`, `path:watch-status`, `path:watch-stop` observe changes without redispatching mise or other hooks. `files-from` supports native macOS find and raw filename output with `-0`; `ctime` means inode change time. `mark_run` logs metadata only; see [its contract](libexec/README.md).
+
+The commented credential experiment in `20-secrets.zsh` remains dormant and untouched with the deferred credential work.

@@ -1,7 +1,8 @@
 # $ZDOTDIR/.zimrc — module configuration for zimfw (grouped, gated via per-module options)
 #
 # ---------------------------------------------------------------------------
-# NOTE: After edits, run: `zimfw update && zimfw install && zimfw clean`
+# Rebuild installed module declarations with `zimfw build`.
+# Install/update/clean modules only as an explicit maintenance action.
 # ---------------------------------------------------------------------------
 
 # Central cache dir for plugins that use $ZSH_CACHE_DIR

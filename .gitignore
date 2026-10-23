@@ -6,3 +6,7 @@
 .zsh_sessions/*
 .zshz-data
 **/*.zwc
+
+# Compiled backups and Python helper cache are generated state.
+**/*.zwc.old
+**/__pycache__/
