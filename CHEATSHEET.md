@@ -181,7 +181,7 @@
 
 ### Cleanup Hooks
 
-- `register_project_cleanup <proc> <socket>` to kill processes & remove sockets on exit.
+- `command &; register_project_cleanup $!` to send TERM to that shell-owned job on exit. Register individual child PIDs; services own their socket cleanup.
 
 ---
 
