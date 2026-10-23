@@ -75,8 +75,8 @@
 
 **1Password CLI**
 
-- Native `op` CLI; its completion script is generated in the dedicated cache.
-- No recursive wrapper or credential lookup runs during completion setup.
+- Native `op` CLI; compinit uses an existing cached or installed `_op` file.
+- Completion setup never invokes `op`; a fresh cache may have no op-specific completion.
 
 **sysadmin-util**
 

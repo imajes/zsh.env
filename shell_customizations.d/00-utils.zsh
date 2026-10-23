@@ -21,6 +21,7 @@
 
   (( $+commands[mise] )) && completion:cache _mise "${commands[mise]}" complete --shell zsh
   (( $+commands[codex-helm] )) && completion:cache _codex-helm "${commands[codex-helm]}" completions zsh
-  (( $+commands[op] )) && completion:cache _op "${commands[op]}" completion zsh
+  # op initializes its daemon/config even for completion generation. Never invoke
+  # it during startup; compinit can use an existing cached or installed _op file.
   return 0
 }

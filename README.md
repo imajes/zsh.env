@@ -26,11 +26,17 @@ explicit pins are not enabled by startup.
 
 ## Generated state
 
-Completions generated from installed mise, codex-helm and op binaries live in
+Completions generated from installed mise and codex-helm binaries live in
 `${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions`, ahead of source completions.
 The generator cache validates syntax and publishes atomically; a failed refresh
 keeps a prior valid cache. The compinit dump is in the parent cache directory.
 Source functions are never compiled during startup.
+
+Startup does not invoke `op`, including for completion generation: the installed
+CLI initializes its daemon/config even for that command. An existing cached or
+installed `_op` file remains usable through compinit. A fresh lab without that
+file has no op-specific completion; generating one is explicit maintenance in an
+appropriate environment, outside the credential-isolated lab.
 
 Compiled `.zwc` and `.zwc.old` files, session timestamps, history and Zim runtime
 state are ignored. Existing compiled backup/session files are untracked, not

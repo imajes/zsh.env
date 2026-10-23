@@ -56,7 +56,8 @@ zmodule ohmyzsh/ohmyzsh --root plugins/keychain --if '[[ $OSTYPE == darwin* && $
 
 zmodule utility                                                 # ⚠️ may churn ls/grep/less aliases
 zmodule exa --if-command eza    # note exa/eza overlap          # ⚠️ may churn ls aliases
-# op provides its own completion script; 00-utils caches it before compinit.
+# compinit can load an existing cached or installed _op completion file.
+# Startup must not invoke op: even completion generation initializes its services.
 # The old 1password-op plugin recursively invokes its own op wrapper.
 zmodule skx/sysadmin-util
 
