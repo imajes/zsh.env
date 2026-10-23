@@ -1,0 +1,7 @@
+#autoload
+emulate -L zsh
+if (( ${precmd_functions[(Ie)path:_watch_precmd]} )); then
+  print -r -- "PATH watch: ON (log -> $_PATH_WATCH_LOG)"
+else
+  print -r -- 'PATH watch: OFF'
+fi

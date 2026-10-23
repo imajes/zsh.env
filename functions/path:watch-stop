@@ -1,0 +1,7 @@
+#autoload
+emulate -L zsh
+autoload -Uz add-zsh-hook
+add-zsh-hook -d precmd path:_watch_precmd
+add-zsh-hook -d chpwd path:_watch_chpwd
+unset _PATH_WATCH_BEFORE _PATH_WATCH_LOG
+return 0
