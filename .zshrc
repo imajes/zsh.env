@@ -81,6 +81,10 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets cursor root)
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[comment]='fg=242'
 
+# Notification contents omit command arguments by default.
+: ${AUTO_NOTIFY_TITLE:=Command completed}
+: ${AUTO_NOTIFY_BODY:=Elapsed: %elapsed seconds; exit: %exit_code}
+
 # Initialize modules (must come AFTER the zstyles above)
 source $ZIM_HOME/init.zsh
 

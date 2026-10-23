@@ -64,7 +64,8 @@
 
 **keychain**
 
-- Integrates with macOS Keychain via `security`.
+- SSH/GPG agent manager; enabled only with `ZSH_KEYCHAIN_ENABLE=1` before startup.
+- This plugin is unrelated to macOS Keychain and its `security` command.
 
 ## 5. Sysadmin & Secrets
 
@@ -76,9 +77,10 @@
 
 - Enhanced `ls` replacement: `exa -h --icons --group-directories-first`.
 
-**1password-op**
+**1Password CLI**
 
-- `op` CLI: `op signin`, `op read`, `op item get`.
+- Native `op` CLI; its completion script is generated in the dedicated cache.
+- No recursive wrapper or credential lookup runs during completion setup.
 
 **sysadmin-util**
 
@@ -132,7 +134,7 @@
 
 **zsh-auto-notify**
 
-- Desktop notification when long-running commands finish.
+- Desktop notification when long-running commands finish; the default title omits command arguments.
 
 ## 9. Final Init (Order Matters)
 

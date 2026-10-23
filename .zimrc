@@ -7,7 +7,6 @@
 # Central cache dir for plugins that use $ZSH_CACHE_DIR
 export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 
-export MACOS_OSTYPE=darwin21.3.0
 
 ################################################################################
 # 1) Core UX (lightweight, safe defaults)
@@ -42,12 +41,13 @@ zmodule Aloxaf/fzf-tab --if-command fzf         # optional; disable if conflicts
 
 zmodule ohmyzsh/ohmyzsh --root plugins/brew #  --if-command brew
 
-# zmodule pndurette/zsh-lux --if-ostype $MACOS_OSTYPE                       # macOS light/dark detection
-zmodule eventi/noreallyjustfuckingstopalready --if-ostype $MACOS_OSTYPE  # macOS DNS reset helpers
-zmodule ohmyzsh/ohmyzsh --root plugins/macos --if-ostype $MACOS_OSTYPE    # macOS utilities
-zmodule ohmyzsh/ohmyzsh --root plugins/keychain --if-ostype $MACOS_OSTYPE
+# zmodule pndurette/zsh-lux --if-ostype 'darwin*'                       # macOS light/dark detection
+zmodule eventi/noreallyjustfuckingstopalready --if-ostype 'darwin*'  # macOS DNS reset helpers
+zmodule ohmyzsh/ohmyzsh --root plugins/macos --if-ostype 'darwin*'    # macOS utilities
+# Agent startup is opt-in; this is the keychain agent manager, not macOS Keychain.
+zmodule ohmyzsh/ohmyzsh --root plugins/keychain --if '[[ $OSTYPE == darwin* && ${ZSH_KEYCHAIN_ENABLE:-0} == 1 ]] && (( $+commands[keychain] ))'
 
-# zmodule sorin-ionescu/prezto --root modules/spectrum --if-ostype $MACOS_OSTYPE  # optional color swatches
+# zmodule sorin-ionescu/prezto --root modules/spectrum --if-ostype 'darwin*'  # optional color swatches
 
 ################################################################################
 # 5) Sysadmin, secrets, helpers
@@ -55,7 +55,8 @@ zmodule ohmyzsh/ohmyzsh --root plugins/keychain --if-ostype $MACOS_OSTYPE
 
 zmodule utility                                                 # ⚠️ may churn ls/grep/less aliases
 zmodule exa --if-command eza    # note exa/eza overlap          # ⚠️ may churn ls aliases
-zmodule unixorn/1password-op.plugin.zsh --if-command op
+# op provides its own completion script; 00-utils caches it before compinit.
+# The old 1password-op plugin recursively invokes its own op wrapper.
 zmodule skx/sysadmin-util
 
 ################################################################################
@@ -65,7 +66,7 @@ zmodule skx/sysadmin-util
 # zmodule joke/zim-mise # --if-command mise   # mise version manager
 
 # 🚫 zmodule ruby --if-command ruby # disable due to low value
-zmodule unixorn/rake-completion.zshplugin --if-command ruby
+zmodule unixorn/rake-completion.zshplugin --source rake_completion.plugin.zsh --if '(( $+commands[ruby] && $+functions[compdef] ))'
 
 zmodule ohmyzsh/ohmyzsh --root plugins/ansible --if-command ansible
 zmodule ohmyzsh/ohmyzsh --root plugins/aws --if-command aws
@@ -83,7 +84,7 @@ zmodule joke/zim-kubectl --if-command kubectl
 # zmodule ohmyzsh/ohmyzsh --root plugins/git-extras --if-command git   # choose one
 # zmodule unixorn/git-extra-commands --if-command git
 
-zmodule wfxr/forgit --if-command git --if-command fzf                 # fzf-powered git ops
+zmodule wfxr/forgit --if '(( $+commands[git] && $+commands[fzf] ))'                 # fzf-powered git ops
 # zmodule ohmyzsh/ohmyzsh --root plugins/gh --if-command gh            # gh CLI helpers
 
 ################################################################################
@@ -91,7 +92,7 @@ zmodule wfxr/forgit --if-command git --if-command fzf                 # fzf-powe
 ################################################################################
 
 zmodule zdharma-continuum/history-search-multi-word  # multi-word history search
-zmodule MichaelAquilina/zsh-auto-notify             # desktop notifications for long cmds
+zmodule MichaelAquilina/zsh-auto-notify --source auto-notify.plugin.zsh --if '[[ $OSTYPE == darwin* ]] || (( $+commands[notify-send] ))'
 
 ################################################################################
 # 9) Last to initialize (must be at the end)

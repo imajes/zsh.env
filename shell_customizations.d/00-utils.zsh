@@ -21,5 +21,6 @@
 
   (( $+commands[mise] )) && completion:cache _mise "${commands[mise]}" complete --shell zsh
   (( $+commands[codex-helm] )) && completion:cache _codex-helm "${commands[codex-helm]}" completions zsh
+  (( $+commands[op] )) && completion:cache _op "${commands[op]}" completion zsh
   return 0
 }
