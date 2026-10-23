@@ -13,15 +13,8 @@ alias nxt=.bundle/gems/next_rails-1.1.0/exe/next.sh
 # export RUBYOPT='-W0 -W:no-deprecated -W:no-experimental'
 alias spacecop='rubocop -A --only Style/FrozenStringLiteralComment,Layout/EmptyLines,Style/StringLiterals,Layout/EmptyLinesAroundBlockBody,Layout/EmptyLinesAroundClassBody,Layout/TrailingWhitespace,Layout/EmptyLinesAroundBlockBody,Layout/EmptyLinesAroundModuleBody,Layout/EmptyLinesAroundMethodBody,Layout/SpaceAroundOperators,Layout/TrailingEmptyLines,Layout/SpaceInsideHashLiteralBraces,Layout/EmptyLineAfterGuardClause,Layout/FirstHashElementIndentation,Layout/EmptyLines,Layout/HashAlignment'
 
-# Neovim Ruby + Pry history logs
-export NVIM_RUBY_LOG_FILE=$HOME/.local/state/nvim/nvim_ruby.log
-export NVIM_RUBY_LOG_LEVEL=debug
-export PRY_HISTFILE=.pry_history
-
-# macOS-only fork-safety
-if [[ $(uname) == Darwin ]]; then
-  export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-fi
+# Debug logging, fork-safety exceptions and Pry history overrides belong to
+# explicit command/project configuration. Normal shells use application defaults.
 
 # Java's executable and JAVA_HOME are owned by mise's configured Java version.
 # Keep Rust's proxies so rust-toolchain overrides work; do not pin a sysroot.

@@ -171,7 +171,9 @@
 
 ### Dev Environment Variables
 
-- `RUBY_YJIT_ENABLE=1`, `DISABLE_SPRING=true`, `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`, `JAVA_HOME` on macOS.
+- Ruby performance preferences remain enabled; mise owns Java and `JAVA_HOME`.
+- Fork-safety exceptions and Neovim Ruby debug logging are not enabled globally.
+- Pry uses its normal history configuration rather than a project-relative override.
 
 ### Directory Navigation
 
