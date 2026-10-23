@@ -84,3 +84,9 @@ module declarations change. Installing/updating/removing modules is a separate
 maintenance operation that may access the network. Startup’s existing bootstrap
 behavior for a missing framework remains; the isolated lab includes the installed
 framework and does not validate a fresh network installation.
+
+The stale reminder measures the core file's age; it does not check releases or
+module freshness. `zimfw check-version` checks the core release and `zimfw upgrade`
+upgrades it. `zimfw check` checks modules and `zimfw update` updates them. Qualify
+core and module upgrades separately in the lab after cleanup validation, before
+applying them to the active shell.

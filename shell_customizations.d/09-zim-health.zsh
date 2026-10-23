@@ -18,8 +18,8 @@
   strftime -s today '%Y-%m-%d' "$EPOCHSECONDS"
   [[ -r $cache ]] && IFS= read -r last_day < "$cache"
   [[ $last_day == $today ]] && return 0
-  print -ru2 -- "Zim core file is at least $threshold days old. Review updates with: zimfw update"
-  print -ru2 -- 'Set ZIMFW_STALE_SILENCE=1 to silence this reminder.'
+  print -ru2 -- "Zim core file is at least $threshold days old. Check: zimfw check-version; upgrade core: zimfw upgrade"
+  print -ru2 -- 'Modules: zimfw check / zimfw update. Set ZIMFW_STALE_SILENCE=1 to silence this reminder.'
   command mkdir -p -- "${cache:h}" && print -r -- "$today" >| "$cache"
   return 0
 }
