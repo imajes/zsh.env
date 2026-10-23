@@ -39,8 +39,9 @@ file has no op-specific completion; generating one is explicit maintenance in an
 appropriate environment, outside the credential-isolated lab.
 
 Compiled `.zwc` and `.zwc.old` files, session timestamps, history and Zim runtime
-state are ignored. Existing compiled backup/session files are untracked, not
-removed from disk. The existing `functions/_mise` source and its local edits are
+state are ignored. Untracking preserves local files. The owner separately
+approved removal of the obsolete `functions/_mise.zwc.old`; its protected lab
+snapshot remains. The existing `functions/_mise` source and its local edits are
 retained for owner review; generated completion takes priority. Duplicate stale
 codex-helm completion files and the unused source-compilation helper are removed.
 The pinned `.zim/zimfw.zsh` bootstrap remains intentionally versioned.
