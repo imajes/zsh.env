@@ -24,17 +24,6 @@ bindkey -e
 WORDCHARS=${WORDCHARS//[\/]}
 
 
-path=(
-  $HOME/bin
-  $HOME/.codex/bin
-  $HOME/.local/bin
-  $path
-)
-
-path:always_keep_at $HOME/bin 1
-path:always_keep_at $HOME/.codex/bin 2
-path:always_keep_at $HOME/.local/bin 3
-
 # Generic aliases with feature detection
 if (( $+commands[eza] )); then
   alias ls='eza --group-directories-first --icons -g -h'

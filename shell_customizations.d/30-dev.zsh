@@ -4,39 +4,6 @@
 path:insert_before /opt/homebrew/bin $HOME/.yarn/bin
 path:insert_before /opt/homebrew/bin $HOME/.config/yarn/global/node_modules/.bin
 
-# Run only if `mise` exists
-(( ${+commands[mise]} )) && () {
-  local command=${commands[mise]}
-
-  # ---- Cache / activation ----
-  local cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/mise
-  mkdir -p "$cache_dir" "$cache_dir/functions"
-
-  local activatefile="$cache_dir/mise-activate.zsh"
-  if [[ ! -e $activatefile || $activatefile -ot $command ]]; then
-    "$command" activate zsh >| "$activatefile"
-    (( $+commands[zcompile] )) && zcompile -UR "$activatefile"
-  fi
-
-  source "$activatefile"
-  source <("$command" hook-env -s zsh)
-
-  # ---- Completions ----
-  # Prefer a writable directory already in $fpath; fall back to cache_dir/functions
-  local compdir=
-  for d in $fpath; do
-    [[ -w $d ]] && compdir=$d && break
-  done
-  [[ -z $compdir ]] && compdir="$cache_dir/functions" && fpath=("$compdir" $fpath)
-  mkdir -p "$compdir"
-
-  local compfile="$compdir/_mise"
-  if [[ ! -e $compfile || $compfile -ot $command ]]; then
-    "$command" complete --shell zsh >| "$compfile"
-    print -u2 -PR "* Regenerated mise completions in $compdir"
-  fi
-}
-
 export MISE_NODE_COREPACK=true
 
 # Ruby performance & aliases
@@ -56,15 +23,9 @@ if [[ $(uname) == Darwin ]]; then
   export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 fi
 
-# macOS-only Java helpers
-if [[ $(uname) == Darwin ]] && [[ -x /usr/libexec/java_home ]]; then
-  export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-  path:insert_before /opt/homebrew/bin /opt/homebrew/opt/openjdk/bin
-  export CPPFLAGS="-I/opt/homebrew/opt/openjdk/include"
-fi
-
-# rust: rustup/cargo related.
-path:insert_before $HOME/.yarn/bin $(rustc --print sysroot)/bin
+# Java's executable and JAVA_HOME are owned by mise's configured Java version.
+# Keep Rust's proxies so rust-toolchain overrides work; do not pin a sysroot.
+[[ -d $HOME/.cargo/bin ]] && path:insert_before /opt/homebrew/bin "$HOME/.cargo/bin"
 
 # rust: completions
 # rustup completions zsh
@@ -72,7 +33,7 @@ path:insert_before $HOME/.yarn/bin $(rustc --print sysroot)/bin
 
 # acme.sh path if present
 if [[ -d $HOME/.acme.sh ]]; then
-  path:insert_before /opt/homebrew/opt/openjdk/bin $HOME/.acme.sh
+  path:insert_before /opt/homebrew/bin "$HOME/.acme.sh"
 fi
 
 # Angular CLI completion (optional)
@@ -88,10 +49,34 @@ fi
 
 # # go related
 export GOPATH=~/src/go
-path:insert_before /opt/homebrew/opt/openjdk/bin $HOME/src/go/bin
+path:insert_before /opt/homebrew/bin "$HOME/src/go/bin"
 
 # export GOBIN=$GOPATH/bin
 # export GO15VENDOREXPERIMENT=1
 # export PATH=$GOPATH/bin:$PATH
+
+# Activate once, after static PATH additions. The supported activation performs
+# its own initial refresh and registers cd/prompt hooks. Its output includes the
+# current session's PATH, so never save or source it from a persistent cache.
+(( ${+commands[mise]} )) && () {
+  local mise_command=${commands[mise]} activation
+  activation=$("$mise_command" activate zsh) || return
+  eval "$activation"
+
+  # Completion ownership/order is handled separately in cef.3.
+  local cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/mise
+  mkdir -p "$cache_dir/functions"
+  local compdir= d
+  for d in $fpath; do
+    [[ -w $d ]] && compdir=$d && break
+  done
+  [[ -z $compdir ]] && compdir="$cache_dir/functions" && fpath=("$compdir" $fpath)
+  mkdir -p "$compdir"
+  local compfile="$compdir/_mise"
+  if [[ ! -e $compfile || $compfile -ot $mise_command ]]; then
+    "$mise_command" complete --shell zsh >| "$compfile"
+    print -u2 -PR "* Regenerated mise completions in $compdir"
+  fi
+}
 
 #  vim: set ft=zsh ts=2 sw=2 tw=0 et :

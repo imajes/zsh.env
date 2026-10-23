@@ -20,10 +20,5 @@ autoload -Uz -- $funcdir/^*.zwc(.N:t)
 
 # Ensure PATH<->path sync is de-duped, first occurrence wins
 typeset -gU path fpath
-autoload -Uz add-zsh-hook path:_enforce_pins
-
-# Run on every prompt; tools that prepend/append get corrected immediately
-add-zsh-hook precmd path:_enforce_pins
-
-# Optional: also on directory change (some tools tweak PATH there)
-add-zsh-hook chpwd  path:_enforce_pins
+# PATH order is established once before mise activation. Prompt/cd pinning
+# would move user bins ahead of active project tools and virtual environments.
