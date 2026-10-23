@@ -1,25 +1,20 @@
 #autoload
-portable:osc7_cwd() {
-  emulate -L zsh
+emulate -L zsh
+[[ -o interactive && -t 1 ]] || return 0
+[[ -n ${OSC7_DISABLE:-} || $TERM == (dumb|linux) ]] && return 0
 
-  # Only bother in interactive shells
-  [[ -o interactive ]] || return 0
-
-  # Allow opt-out or skip for very minimal terminals
-  [[ -n ${OSC7_DISABLE:-} ]] && return 0
-  [[ $TERM == (dumb|linux) ]] && return 0
-
-  local host path url_path
-  host=${OSC7_HOST:-$HOST}
-  path=$PWD
-
-  # Very small, cheap URL-style escaping for common cases: encode spaces
-  # and literal '#' characters inside the path.
-  url_path=${path// /%20}
-
-  # OSC 7: report current working directory as a canonical file:// URL.
-  # Use ST (ESC \) terminator for compatibility with most terminals.
-  printf '\033]7;file://%s%s\033\\' "$host" "$url_path"
-}
-
-#  vim: set ft=zsh ts=2 sw=2 tw=0 et :
+# Encode UTF-8 bytes, including percent and all terminal control characters.
+local LC_ALL=C value encoded character hex host directory
+for value in "${OSC7_HOST:-$HOST}" "$PWD"; do
+  encoded=''
+  for character in ${(s::)value}; do
+    if [[ $character == [a-zA-Z0-9._~-] || ( -n $host && $character == / ) ]]; then
+      encoded+=$character
+    else
+      builtin printf -v hex '%02X' "'$character"
+      encoded+="%$hex"
+    fi
+  done
+  if [[ -z $host ]]; then host=$encoded; else directory=$encoded; fi
+done
+builtin printf '\033]7;file://%s%s\033\\' "$host" "$directory"

@@ -12,6 +12,7 @@
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+source "$ZDOTDIR/shell_customizations.d/03-terminal.zsh"
 [[ -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] && source ${ZDOTDIR:-$HOME}/.p10k.zsh
 
 # Executable discovery and fpath must precede Zim's conditional modules/compinit.
@@ -74,7 +75,11 @@ export ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 # zsh-syntax-highlighting
 # Set what highlighters will be used.
 # Docs: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets cursor root)
+if (( ZSH_PORTABLE_MODE )); then
+  ZSH_HIGHLIGHT_HIGHLIGHTERS=()
+else
+  ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets cursor root)
+fi
 
 # Customize the main highlighter styles.
 # Docs: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters/main.md#how-to-tweak-it
@@ -96,7 +101,7 @@ source $ZIM_HOME/init.zsh
 
 if [[ -d $ZDOTDIR/shell_customizations.d ]]; then
   for f in $ZDOTDIR/shell_customizations.d/(*.zsh)(Non); do
-    [[ ${f:t} == (00-utils|01-path).zsh ]] && continue
+    [[ ${f:t} == (00-utils|01-path|03-terminal).zsh ]] && continue
     (( ${+DEBUG_ZDOT} )) && echo "sourcing $f" >&2
     source "$f"
   done

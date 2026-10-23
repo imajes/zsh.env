@@ -7,15 +7,15 @@ update_theme() {
   local mode
 
   # Portable / remote shells: prefer explicit LIGHT_MODE, else default LIGHT.
-  if [[ -n $SSH_CONNECTION || -f /.dockerenv ]]; then
+  if [[ ${ZSH_PORTABLE_MODE:-0} == 1 ]]; then
     mode="${LIGHT_MODE:-LIGHT}"
   else
     # Local shells.
-    if [[ $(uname) == Darwin ]] && command -v defaults >/dev/null 2>&1; then
+    if [[ $OSTYPE == darwin* ]] && (( $+commands[defaults] )); then
       # On macOS, always query the current interface style so existing shells
       # follow system dark/light mode changes.
       local style
-      if style=$(defaults read -g AppleInterfaceStyle 2>/dev/null); then
+      if style=$(command defaults read -g AppleInterfaceStyle 2>/dev/null); then
         [[ ${style:l} == dark ]] && mode='DARK' || mode='LIGHT'
       else
         mode='LIGHT'
@@ -39,12 +39,10 @@ update_theme() {
   fi
 }
 
-# macOS: run on every prompt so theme tracks system appearance;
-# on other hosts, run once at startup using the current LIGHT_MODE.
-[[ $(uname) == Darwin ]] && precmd() { update_theme }
+# Preserve other prompt owners and deduplicate on repeated sourcing.
+autoload -Uz add-zsh-hook
+add-zsh-hook -d precmd update_theme
+if [[ $OSTYPE == darwin* && ${ZSH_PORTABLE_MODE:-0} != 1 ]]; then
+  add-zsh-hook precmd update_theme
+fi
 update_theme
-
-# Load Powerlevel10k prompt (after theme vars)
-[[ -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] && source ${ZDOTDIR:-$HOME}/.p10k.zsh
-
-#  vim: set ft=zsh ts=2 sw=2 tw=0 et :

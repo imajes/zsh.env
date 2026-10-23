@@ -183,7 +183,9 @@
 
 ### Portable/CI Mode
 
-- On SSH or Docker: disable gitstatus, highlights, autosuggestions for performance.
+- On SSH, Docker, or `CI=true`/`CI=1`: select policy before initialization, disable gitstatus, and skip syntax-highlighting/autosuggestion modules.
+- Powerlevel10k configuration loads once. Theme updates use a deduplicated hook and preserve other `precmd` functions.
+- Portable OSC7 reports percent-encoded directory URLs only to supported interactive terminals; `OSC7_DISABLE=1` opts out.
 
 ### Cleanup Hooks
 

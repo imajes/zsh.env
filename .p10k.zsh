@@ -24,6 +24,8 @@
   # Unset all configuration options. This allows you to apply configuration changes without
   # restarting zsh. Edit ~/.p10k.zsh and type `source ~/.p10k.zsh`.
   unset -m '(POWERLEVEL9K_*|DEFAULT_USER)~POWERLEVEL9K_GITSTATUS_DIR'
+  # Applied before Powerlevel10k initializes; retain this on config reload.
+  [[ ${ZSH_PORTABLE_MODE:-0} == 1 ]] && typeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true
 
   # Zsh >= 5.1 is required.
   [[ $ZSH_VERSION == (5.<1->*|<6->.*) ]] || return
