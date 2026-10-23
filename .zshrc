@@ -14,6 +14,10 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 [[ -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] && source ${ZDOTDIR:-$HOME}/.p10k.zsh
 
+# Executable discovery and fpath must precede Zim's conditional modules/compinit.
+source "$ZDOTDIR/shell_customizations.d/01-path.zsh"
+source "$ZDOTDIR/shell_customizations.d/00-utils.zsh"
+
 # -------------------- Zim bootstrap --------------------
 ZIM_HOME=${ZDOTDIR:-$HOME}/.zim
 if [[ ! -e $ZIM_HOME/zimfw.zsh ]]; then
@@ -88,6 +92,7 @@ source $ZIM_HOME/init.zsh
 
 if [[ -d $ZDOTDIR/shell_customizations.d ]]; then
   for f in $ZDOTDIR/shell_customizations.d/(*.zsh)(Non); do
+    [[ ${f:t} == (00-utils|01-path).zsh ]] && continue
     (( ${+DEBUG_ZDOT} )) && echo "sourcing $f" >&2
     source "$f"
   done

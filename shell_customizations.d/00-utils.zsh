@@ -1,24 +1,25 @@
-# 00-path-utils.zsh — tiny bootstrapper
-#
-fpath=("~/.local/share/zsh/site-functions" $fpath)
+# Prepare functions and completions before Zim initializes compinit.
+() {
+  emulate -L zsh
+  local funcdir="$ZDOTDIR/functions" file
+  local site_functions="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions"
+  typeset -gU path fpath
+  [[ -d $site_functions ]] && fpath=("$site_functions" "${fpath[@]}")
+  [[ -d $funcdir ]] && fpath=("$funcdir" "${fpath[@]}")
 
-local funcdir=$ZDOTDIR/functions
-[[ -d $funcdir ]] || mkdir -p -- "$funcdir"
-fpath=($funcdir $fpath)
+  # Source files stay immutable. In particular, never compile .zwc beside them.
+  for file in "$funcdir"/*(.N); do
+    [[ ${file:t} == _* || $file == *.zwc || $file == *.zwc.old ]] && continue
+    autoload -Uz -- "${file:t}"
+  done
 
-# --- Source the compile helper directly (once), then use it ---
-source -- "$funcdir/util:compile_functions_if_stale"
+  typeset -g ZSH_COMPLETION_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions"
+  command mkdir -p -m 700 -- "$ZSH_COMPLETION_CACHE" || return
+  fpath=("$ZSH_COMPLETION_CACHE" "${fpath[@]}")
+  zstyle ':zim:completion' dumpfile "${ZSH_COMPLETION_CACHE:h}/zcompdump-$ZSH_VERSION"
+  zstyle ':completion:*' cache-path "${ZSH_COMPLETION_CACHE:h}/completion-data"
 
-# Run the compiler if available
-# command -v util:compile_functions_if_stale >/dev/null && util:compile_functions_if_stale "$funcdir"
-util:compile_functions_if_stale "$funcdir"
-util:compile_functions_if_stale "$HOME/.local/share/zsh/site-functions"
-
-# Register all function files for lazy autoload (skip .zwc)
-setopt localoptions extendedglob
-autoload -Uz -- $funcdir/^*.zwc(.N:t)
-
-# Ensure PATH<->path sync is de-duped, first occurrence wins
-typeset -gU path fpath
-# PATH order is established once before mise activation. Prompt/cd pinning
-# would move user bins ahead of active project tools and virtual environments.
+  (( $+commands[mise] )) && completion:cache _mise "${commands[mise]}" complete --shell zsh
+  (( $+commands[codex-helm] )) && completion:cache _codex-helm "${commands[codex-helm]}" completions zsh
+  return 0
+}

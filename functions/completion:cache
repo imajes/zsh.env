@@ -1,0 +1,28 @@
+#autoload
+# Generate into our explicit cache, validating before an atomic rename.
+emulate -L zsh
+local name=$1 executable=$2
+shift 2
+local target="$ZSH_COMPLETION_CACHE/$name" temporary fingerprint first_line
+local -A metadata
+[[ $name == _* && $name != */* && -x $executable ]] || return 1
+zmodload -F zsh/stat b:zstat || return
+zstat -H metadata -- "${executable:A}" || return
+fingerprint=$(print -rn -- "${executable:A}" "$metadata[mtime]" "$metadata[size]" "${(qqq)@}" | /usr/bin/cksum) || return
+fingerprint="# zsh-completion-cache: $fingerprint"
+[[ -r $target && $(command tail -n 1 -- "$target") == "$fingerprint" ]] && return 0
+
+temporary=$(command mktemp "$ZSH_COMPLETION_CACHE/.${name}.XXXXXXXX") || return
+{
+  if "$executable" "$@" >| "$temporary" &&
+     IFS= read -r first_line < "$temporary" &&
+     [[ $first_line == '#compdef '* ]] && /bin/zsh -nf "$temporary"; then
+    print -rl -- "" "$fingerprint" >> "$temporary"
+    command mv -f -- "$temporary" "$target"
+  else
+    print -ru2 -- "Completion generation failed for $name; keeping the previous cache."
+    return 1
+  fi
+} always {
+  command rm -f -- "$temporary"
+}

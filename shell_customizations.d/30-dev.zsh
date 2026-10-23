@@ -63,20 +63,6 @@ path:insert_before /opt/homebrew/bin "$HOME/src/go/bin"
   activation=$("$mise_command" activate zsh) || return
   eval "$activation"
 
-  # Completion ownership/order is handled separately in cef.3.
-  local cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/mise
-  mkdir -p "$cache_dir/functions"
-  local compdir= d
-  for d in $fpath; do
-    [[ -w $d ]] && compdir=$d && break
-  done
-  [[ -z $compdir ]] && compdir="$cache_dir/functions" && fpath=("$compdir" $fpath)
-  mkdir -p "$compdir"
-  local compfile="$compdir/_mise"
-  if [[ ! -e $compfile || $compfile -ot $mise_command ]]; then
-    "$mise_command" complete --shell zsh >| "$compfile"
-    print -u2 -PR "* Regenerated mise completions in $compdir"
-  fi
 }
 
 #  vim: set ft=zsh ts=2 sw=2 tw=0 et :
