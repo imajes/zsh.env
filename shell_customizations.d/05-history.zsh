@@ -9,7 +9,7 @@ export SAVEHIST=200000
 
 ## 1) History Persistence
 setopt APPEND_HISTORY             # Append new commands to the history file on shell exit
-setopt INC_APPEND_HISTORY         # Write each command to the history file immediately
+unsetopt INC_APPEND_HISTORY INC_APPEND_HISTORY_TIME  # SHARE_HISTORY owns incremental writes
 setopt SHARE_HISTORY              # Share history across all running shell sessions
 setopt EXTENDED_HISTORY           # Record timestamp of each command in the history file
 
@@ -25,33 +25,27 @@ setopt HIST_VERIFY                # Require confirmation before executing histor
 ## 4) Maintenance Rules
 setopt HIST_EXPIRE_DUPS_FIRST     # When trimming history, remove older duplicates before unique entries
 
-# Atuin: magical history (keep near HISTFILE so it owns the stack)
-# Docs: https://atuin.sh
-# if [[ -f $HOME/.atuin/bin/env ]]; then
-#   source $HOME/.atuin/bin/env
-# fi
-# Put atuin bin on PATH (zsh-safe, no duplicates)
-if (( ! ${path[(Ie)$HOME/.atuin/bin]} )); then
-  path:insert_before /opt/homebrew/bin $HOME/.atuin/bin
-fi
-if (( $+commands[atuin] )); then
-  eval "$(atuin init zsh)"
+# Atuin owns Ctrl-R; substring search owns Up/Down and Ctrl-P/Ctrl-N.
+# Without Atuin, Zim's multi-word search remains the Ctrl-R fallback.
+[[ -d $HOME/.atuin/bin ]] && path:insert_before /opt/homebrew/bin "$HOME/.atuin/bin"
+if [[ -o interactive ]] && (( $+commands[atuin] && ! $+functions[_atuin_preexec] )); then
+  eval "$(command atuin init zsh --disable-up-arrow)"
 fi
 
 # history-substring-search keybindings (guarded)
 if zmodload -F zsh/terminfo +p:terminfo 2>/dev/null; then
   if (( $+functions[history-substring-search-up] && $+functions[history-substring-search-down] )); then
     for key ('^[[A' '^P' ${terminfo[kcuu1]}); do
-      bindkey ${key} history-substring-search-up
+      [[ -n $key ]] && bindkey "${key}" history-substring-search-up
     done
     for key ('^[[B' '^N' ${terminfo[kcud1]}); do
-      bindkey ${key} history-substring-search-down
+      [[ -n $key ]] && bindkey "${key}" history-substring-search-down
     done
     for key ('k'); do
-      bindkey -M vicmd ${key} history-substring-search-up
+      bindkey -M vicmd "${key}" history-substring-search-up
     done
     for key ('j'); do
-      bindkey -M vicmd ${key} history-substring-search-down
+      bindkey -M vicmd "${key}" history-substring-search-down
     done
     unset key
   fi

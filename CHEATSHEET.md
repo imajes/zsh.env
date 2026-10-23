@@ -159,13 +159,15 @@
 ### History Settings
 
 - `HISTSIZE=200000`, `SAVEHIST=200000`.
-- `setopt INC_APPEND_HISTORY`, `SHARE_HISTORY`, `EXTENDED_HISTORY`, plus hygiene flags.
+- `SHARE_HISTORY` writes and imports shared history; competing incremental modes are disabled. `EXTENDED_HISTORY` and hygiene flags remain.
 
 ### Editor Wrappers
 
 - `vi`/`vim` redirect to preferred `$EDITOR` (`nvim` > `vim` > `vi`), with pause prompt.
 
 ### Atuin Integration
+
+- Ctrl-R uses Atuin when installed; otherwise Zim multi-word search remains available. Up/Down and Ctrl-P/Ctrl-N use substring search. Re-sourcing history configuration does not reinitialize Atuin.
 
 - `atuin init zsh` for searchable, remote-synced history.
 

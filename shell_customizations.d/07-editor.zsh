@@ -27,7 +27,7 @@ if [[ -o interactive ]]; then
     if [[ $target != vi ]] && __editor_should_pause; then
       printf "Running %s instead of vi. Press Enter to continue, or run 'command vi' to force system vi.\n" "$target"
       printf "Tip: to disable these wrappers this session: 'unfunction vi vim'\n"
-      read -r
+      read -r || return 1
     fi
     command "$target" "$@"
   }
@@ -36,9 +36,10 @@ if [[ -o interactive ]]; then
     if [[ $target != vim ]] && __editor_should_pause; then
       printf "Running %s instead of vim. Press Enter to continue, or run 'command vim' to force system vim.\n" "$target"
       printf "Tip: to disable these wrappers this session: 'unfunction vi vim'\n"
-      read -r
+      read -r || return 1
     fi
     command "$target" "$@"
   }
 fi
 
+unset __editor_choice
