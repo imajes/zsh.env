@@ -10,3 +10,6 @@
 # Compiled backups and Python helper cache are generated state.
 **/*.zwc.old
 **/__pycache__/
+
+# Isolated development checkouts.
+.worktrees/
