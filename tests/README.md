@@ -41,6 +41,8 @@ Empty/relative entries and aliases of bare HOME are removed. Missing user tool
 directories and paths containing a colon are not added. PATH keeps exact directory
 names containing spaces or glob characters, and repeated initialization deduplicates
 entries. The platform fallback for `ls` uses BSD or GNU options as appropriate.
+The `msgvault` wrapper discovers its external binary through PATH and retains
+`MSGVAULT_BIN` overrides; its existing credential/restore behavior is unchanged.
 
 ## Quick manual check after candidate installation
 

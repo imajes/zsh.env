@@ -2,12 +2,14 @@
 msgvault() {
   emulate -L zsh
 
-  local msgvault_bin="${MSGVAULT_BIN:-/opt/homebrew/bin/msgvault}"
+  # $commands resolves the external executable even though this function has
+  # the same name. Keep the explicit override for account-specific installations.
+  local msgvault_bin="${MSGVAULT_BIN:-${commands[msgvault]:-}}"
   local client_secret="$HOME/.config/msgvault/client_secret.json"
   local restore_helper="$HOME/bin/restore-msgvault-client-secret.zsh"
 
-  if [[ ! -x "$msgvault_bin" ]]; then
-    print -u2 "msgvault binary not found or not executable: $msgvault_bin"
+  if [[ -z $msgvault_bin || ! -x "$msgvault_bin" ]]; then
+    print -u2 "msgvault binary not found or not executable: ${msgvault_bin:-PATH}"
     return 127
   fi
 
