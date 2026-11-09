@@ -29,8 +29,12 @@ if (( $+commands[eza] )); then
   alias ls='eza --group-directories-first --icons -g -h'
 elif (( $+commands[exa] )); then
   alias ls='exa --group-directories-first --icons -g -h'
-else
+elif [[ $OSTYPE == darwin* || $OSTYPE == *bsd* ]]; then
   alias ls='ls -G'
+elif [[ $OSTYPE == linux* ]]; then
+  alias ls='ls --color=auto'
+else
+  alias ls='ls'
 fi
 alias la='ls -l -a'
 

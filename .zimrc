@@ -40,7 +40,7 @@ zmodule Aloxaf/fzf-tab --if-command fzf         # optional; disable if conflicts
 # 4) macOS-specific
 ################################################################################
 
-zmodule ohmyzsh/ohmyzsh --root plugins/brew #  --if-command brew
+zmodule ohmyzsh/ohmyzsh --root plugins/brew --if-command brew
 
 # zmodule pndurette/zsh-lux --if-ostype 'darwin*'                       # macOS light/dark detection
 zmodule eventi/noreallyjustfuckingstopalready --if-ostype 'darwin*'  # macOS DNS reset helpers

@@ -1,8 +1,6 @@
 # $ZDOTDIR/shell_customizations.d/30-dev.zsh - language & tooling helpers
 
-# Yarn / Node paths
-path:insert_before /opt/homebrew/bin $HOME/.yarn/bin
-path:insert_before /opt/homebrew/bin $HOME/.config/yarn/global/node_modules/.bin
+# Static tool paths, including Rust proxies and GOPATH, are owned by 01-path.zsh.
 
 export MISE_NODE_COREPACK=true
 
@@ -18,16 +16,10 @@ alias spacecop='rubocop -A --only Style/FrozenStringLiteralComment,Layout/EmptyL
 
 # Java's executable and JAVA_HOME are owned by mise's configured Java version.
 # Keep Rust's proxies so rust-toolchain overrides work; do not pin a sysroot.
-[[ -d $HOME/.cargo/bin ]] && path:insert_before /opt/homebrew/bin "$HOME/.cargo/bin"
 
 # rust: completions
 # rustup completions zsh
 # rustup completions zsh cargo
-
-# acme.sh path if present
-if [[ -d $HOME/.acme.sh ]]; then
-  path:insert_before /opt/homebrew/bin "$HOME/.acme.sh"
-fi
 
 # Angular CLI completion (optional)
 if (( $+commands[ng] )); then
@@ -41,9 +33,6 @@ fi
 # export MAX_LOCKED_MEMORY=32m
 
 # # go related
-export GOPATH=~/src/go
-path:insert_before /opt/homebrew/bin "$HOME/src/go/bin"
-
 # export GOBIN=$GOPATH/bin
 # export GO15VENDOREXPERIMENT=1
 # export PATH=$GOPATH/bin:$PATH

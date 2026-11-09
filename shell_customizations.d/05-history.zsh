@@ -27,7 +27,7 @@ setopt HIST_EXPIRE_DUPS_FIRST     # When trimming history, remove older duplicat
 
 # Atuin owns Ctrl-R; substring search owns Up/Down and Ctrl-P/Ctrl-N.
 # Without Atuin, Zim's multi-word search remains the Ctrl-R fallback.
-[[ -d $HOME/.atuin/bin ]] && path:insert_before /opt/homebrew/bin "$HOME/.atuin/bin"
+# Executable discovery is owned by 01-path.zsh on every platform.
 if [[ -o interactive ]] && (( $+commands[atuin] && ! $+functions[_atuin_preexec] )); then
   eval "$(command atuin init zsh --disable-up-arrow)"
 fi
