@@ -57,8 +57,15 @@ pause; EOF cancels the pause. Keychain agent startup requires
 SSH, Docker and `CI=true`/`CI=1` select portable policy before modules initialize.
 Gitstatus is disabled and syntax-highlighting/autosuggestion modules are skipped.
 OSC7 uses encoded URLs, supported interactive terminals only, and
-`OSC7_DISABLE=1` as an opt-out. This does not implement the separate terminal
-appearance pilot or choose new palettes.
+`OSC7_DISABLE=1` as an opt-out.
+
+[Terminal appearance](docs/terminal-appearance.md) is selected once at the first
+interactive prompt through rod: dayfox for light terminals, duskfox for dark.
+The attached terminal supplies the mode through SSH and new root shells. The
+shell exports the legacy `LIGHT_MODE` result, updates grep/autosuggestions and
+selects delta's matching native feature. Bat and Neovim use their own terminal
+detection. The companion portable-env assets and detector installation are
+required; live switching and the real remote pilot are separate follow-up work.
 
 `register_project_cleanup PID` accepts only a job owned by this shell and sends
 TERM to that registered PID at exit. It never kills by process name or removes

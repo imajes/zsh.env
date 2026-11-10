@@ -14,6 +14,11 @@ ZSH_TEST_SHELL=/opt/homebrew/bin/zsh python3 -m unittest discover -s tests -v
 
 Use an installed Zsh path on Linux. The Homebrew command is optional on macOS.
 
+The terminal appearance tests additionally allocate temporary PTYs and exercise
+the Bash adapter. Set `REAL_ROD=/absolute/path/to/rod` to include the real upstream
+detector; otherwise that optional case is skipped. PTY tests need terminal ioctl
+access when run in a sandbox. See [terminal appearance](../docs/terminal-appearance.md).
+
 ## Portable policy
 
 `~/.zsh_portable-env`, when readable, is sourced before Powerlevel10k and Zim.
