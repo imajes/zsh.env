@@ -59,13 +59,14 @@ Gitstatus is disabled and syntax-highlighting/autosuggestion modules are skipped
 OSC7 uses encoded URLs, supported interactive terminals only, and
 `OSC7_DISABLE=1` as an opt-out.
 
-[Terminal appearance](docs/terminal-appearance.md) is selected once at the first
-interactive prompt through rod: dayfox for light terminals, duskfox for dark.
-The attached terminal supplies the mode through SSH and new root shells. The
-shell exports the legacy `LIGHT_MODE` result, updates grep/autosuggestions and
-selects delta's matching native feature. Bat and Neovim use their own terminal
-detection. The companion portable-env assets and detector installation are
-required; live switching and the real remote pilot are separate follow-up work.
+[Terminal appearance](docs/terminal-appearance.md) follows the attached terminal:
+dayfox for light terminals, duskfox for dark. Rod initializes the first prompt;
+terminal notifications update existing Zsh/Bash shells and visible suggestions
+when the background changes. WezTerm uses the companion palette-event adapter;
+tmux 3.6+ uses the supplied client hooks. The shell exports `LIGHT_MODE`, updates
+grep/autosuggestions and selects delta's matching feature. Bat and Neovim use
+their own terminal detection. The real remote/root pilot remains separate from
+local validation.
 
 `register_project_cleanup PID` accepts only a job owned by this shell and sends
 TERM to that registered PID at exit. It never kills by process name or removes

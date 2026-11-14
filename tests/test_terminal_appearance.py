@@ -167,7 +167,7 @@ print(mode)
     def test_first_editable_prompt_after_instant_prompt_redirection(self):
         adapter = shlex.quote(str(ROOT / "shell_customizations.d/10-theme.zsh"))
         for redirected in (False, True):
-            for mode, style in (("dark", "fg=228"), ("light", "fg=090")):
+            for mode, style in (("dark", "fg=228"), ("light", "fg=90")):
                 with self.subTest(redirected=redirected, mode=mode):
                     self.log.write_text("")
                     redirect = ('exec {saved_in}<&0 {saved_out}>&1 0</dev/null 1>"$HOME/captured"\n'
@@ -190,8 +190,61 @@ print(mode)
                                        dict(self.env, ZDOTDIR=str(self.home), FAKE_MODE=mode))
                     self.assertEqual(rc, 0, out)
                     self.assertIn(f"RESULT:{mode}|{style}", out)
-                    self.assertNotIn("_lab_terminal_", out)
+                    self.assertNotIn("HOOKS:_lab_terminal_startup", out)
+                    self.assertIn("_lab_terminal_line_init", out)
                     self.assertEqual(self.log.read_text(), "query\n")
+
+    def test_live_reports_preserve_line_and_update_suggestion(self):
+        adapter = shlex.quote(str(ROOT / "shell_customizations.d/10-theme.zsh"))
+        for keymap in ("emacs", "viins", "vicmd"):
+            with self.subTest(keymap=keymap):
+                (self.home / ".zshrc").write_text(f"source {adapter}\n" +
+                    'functions[_fixture_notify]=$functions[_lab_terminal_notification]\n'
+                    'typeset -gi event_count=0\n'
+                    '_lab_terminal_notification() { '
+                    '_fixture_notify "$@"; '
+                    'print -r -- "EVENT:$LAB_TERMINAL_THEME|$ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE|'
+                    '$BUFFER|$CURSOR|$POSTDISPLAY" >> "$HOME/events"; '
+                    'if (( ++event_count == 2 )); then BUFFER=exit; POSTDISPLAY=; zle accept-line; fi; return 0; }\n'
+                    'fixture_line() { BUFFER="keep typed text"; CURSOR=4; '
+                    'POSTDISPLAY=" suggestion"; zle -K ' + keymap + '; }\n'
+                    'add-zle-hook-widget line-init fixture_line\nPS1="fixture> "\n')
+                events = self.home / "events"
+                events.write_text("")
+                rc, out = terminal([shell_path("zsh"), "-di"],
+                    dict(self.env, ZDOTDIR=str(self.home), FAKE_MODE="light"),
+                    {b"\x1b]1337;SetUserVar=LAB_TERMINAL_NOTIFY=MQ==\x07":
+                     b"\x1b[?997;1n\x1b[?997;2n"})
+                self.assertEqual(rc, 0, out)
+                self.assertEqual(events.read_text().splitlines(), [
+                    "EVENT:dark|fg=228|keep typed text|4| suggestion",
+                    "EVENT:light|fg=90|keep typed text|4| suggestion"])
+                self.assertIn("\x1b[?2031h", out)
+                self.assertIn("\x1b[?2031l", out)
+                self.assertIn("LAB_TERMINAL_NOTIFY=MA==", out)
+
+    def test_bash_live_reports_preserve_readline(self):
+        bash = shell_path("bash")
+        version = subprocess.check_output([bash, "-c", 'printf "%s" "$BASH_VERSION"'], text=True)
+        if tuple(map(int, version.split(".")[:2])) < (4, 4):
+            self.skipTest("Bash 4.4+ PS0 required")
+        adapter = shlex.quote(str(ROOT / "libexec/terminal-appearance.bash"))
+        rcfile = self.home / ".bashrc"
+        rcfile.write_text(f"source {adapter}\n" +
+            '_fixture_event() { '
+            'printf "EVENT:%s|%s|%s\\n" "$LAB_TERMINAL_THEME" "$READLINE_LINE" "$READLINE_POINT" >> "$HOME/events"; }\n'
+            '_lab_terminal_notify_dark() { lab_theme_refresh dark; _fixture_event; }\n'
+            '_lab_terminal_notify_light() { lab_theme_refresh light; _fixture_event; }\n'
+            'PS1="fixture> "\n')
+        rc, out = terminal([bash, "--noprofile", "--rcfile", str(rcfile), "-i"],
+            dict(self.env, FAKE_MODE="light"),
+            {b"\x1b]1337;SetUserVar=LAB_TERMINAL_NOTIFY=MQ==\x07":
+             b"echo keep\x1b[?997;1n\x1b[?997;2n\x15exit\n"})
+        self.assertEqual(rc, 0, out)
+        self.assertEqual((self.home / "events").read_text().splitlines(), [
+            "EVENT:dark|echo keep|9", "EVENT:light|echo keep|9"])
+        self.assertIn("\x1b[?2031l", out)
+        self.assertIn("LAB_TERMINAL_NOTIFY=MA==", out)
 
     def test_missing_detector_uses_light(self):
         (self.home / "bin/rod").unlink()

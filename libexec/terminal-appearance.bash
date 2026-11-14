@@ -37,10 +37,15 @@ lab_theme_refresh() {
 }
 
 _lab_terminal_startup() {
-  [[ ${_lab_terminal_started-} == 1 ]] && return 0
-  [[ -t 0 && -t 1 ]] || return 0
-  lab_theme_refresh
-  _lab_terminal_started=1
+  [[ -t 0 && -t 1 && ${TERM-} != dumb ]] || return 0
+  if [[ ${_lab_terminal_started-} != 1 ]]; then
+    lab_theme_refresh
+    _lab_terminal_started=1
+  fi
+  if [[ ${_lab_terminal_readline_events-} == 1 ]]; then
+    printf '\033[?2031h\033[?996n'
+    [[ -n ${TMUX-} ]] || printf '\033]1337;SetUserVar=LAB_TERMINAL_NOTIFY=MQ==\007'
+  fi
 }
 
 # Preserve scalar and array PROMPT_COMMAND, and avoid duplicate hooks.
@@ -53,4 +58,19 @@ if [[ ${_lab_terminal_hook_installed-} != 1 ]]; then
     PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }_lab_terminal_startup"
   fi
   _lab_terminal_hook_installed=1
+fi
+
+# Bash 4.4+ provides PS0, emitted after Readline accepts a command and before
+# execution. It gives notifications the same prompt-only lifetime as Zsh's ZLE.
+if (( BASH_VERSINFO[0] > 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4) )) &&
+   [[ ${_lab_terminal_readline_events-} != 1 && -t 0 && -t 1 && ${TERM-} != dumb ]]; then
+  _lab_terminal_notify_dark() { lab_theme_refresh dark; }
+  _lab_terminal_notify_light() { lab_theme_refresh light; }
+  bind -x '"\e[?997;1n":_lab_terminal_notify_dark'
+  bind -x '"\e[?997;2n":_lab_terminal_notify_light'
+  _lab_terminal_stop=$'\e[?2031l'
+  [[ -n ${TMUX-} ]] || _lab_terminal_stop+=$'\e]1337;SetUserVar=LAB_TERMINAL_NOTIFY=MA==\a'
+  PS0="${_lab_terminal_stop}${PS0-}"
+  unset _lab_terminal_stop
+  _lab_terminal_readline_events=1
 fi
